@@ -1,0 +1,96 @@
+plugins {
+  id 'java'
+  id 'maven'
+  id 'net.minecrell.licenser' version '0.3'
+}
+
+group 'com.almuradev'
+version '1.0.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+tasks.withType(JavaCompile) {
+  options.compilerArgs += ['-Xlint:all', '-Xlint:-path', '-parameters']
+  options.deprecation = true
+  options.encoding = 'UTF-8'
+}
+
+license {
+  header project.file('header.txt')
+  include '**/*.java'
+  newLine false
+}
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+task javadocJar(type: Jar) {
+  classifier 'javadoc'
+  from javadoc
+}
+
+task sourcesJar(type: Jar) {
+  classifier 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives javadocJar
+  archives sourcesJar
+}
+
+jar {
+  manifest.attributes(
+    'Automatic-Module-Name': 'com.almuradev.droplet'
+  )
+}
+
+if(project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+  uploadArchives {
+    enabled = System.getenv('TRAVIS') == null || project.version.endsWith('-SNAPSHOT')
+
+    repositories {
+      mavenDeployer {
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+          authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+          authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        pom.project {
+          description 'Shared utilities built for working with complex systems.'
+          name project.name
+          url 'https://github.com/AlmuraDev/Droplet/'
+
+          developers {
+            developer {
+              name 'kashike'
+            }
+          }
+
+          issueManagement {
+            system 'GitHub Issues'
+            url 'https://github.com/AlmuraDev/Droplet/issues'
+          }
+
+          licenses {
+            license {
+              name 'MIT License'
+              url 'https://opensource.org/licenses/MIT'
+            }
+          }
+
+          scm {
+            connection 'scm:git@github.com:AlmuraDev/Droplet.git'
+            developerConnection 'scm:git@github.com:AlmuraDev/Droplet.git'
+            url 'https://github.com/AlmuraDev/Droplet/'
+          }
+        }
+      }
+    }
+  }
+}
