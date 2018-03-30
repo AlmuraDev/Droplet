@@ -23,7 +23,6 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.component.filter.FilterLinked;
 import com.almuradev.droplet.component.filter.FilterQuery;
 import net.kyori.lunar.collection.MoreIterables;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -83,24 +82,14 @@ public interface DoubleRange {
 
   interface Filtered extends DoubleRange, com.almuradev.droplet.component.filter.Filtered {
     @Nullable
-    static <T> DoubleRange cachingSearch(final List<FilterLinked<DoubleRange>> list, final Map<T, DoubleRange> map, final T biome, final FilterQuery query, final DoubleRange defaultValue) {
-      @Nullable DoubleRange found = map.get(biome);
+    static <T> DoubleRange cachingSearch(final DefaultedFilteredDoubleRangeList list, final Map<T, DoubleRange> map, final T biome, final FilterQuery query) {
+      /* @Nullable */ DoubleRange found = list.oneOrDefault(query);
       if(found == null) {
-        for(final FilterLinked<DoubleRange> entry : list) {
-          if(entry.test(query)) {
-            final DoubleRange range = entry.value();
-            map.put(biome, range);
-            found = range;
-            break;
-          }
+        found = list.oneOrDefault(query);
+        if(found != null) {
+          map.put(biome, found);
         }
       }
-
-      if(found == null && defaultValue != null) {
-        map.put(biome, defaultValue);
-        found = defaultValue;
-      }
-
       return found;
     }
   }

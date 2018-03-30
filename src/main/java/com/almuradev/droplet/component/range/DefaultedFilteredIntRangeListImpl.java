@@ -23,60 +23,50 @@
  */
 package com.almuradev.droplet.component.range;
 
+import com.almuradev.droplet.component.filter.FilterLinked;
 import com.almuradev.droplet.component.filter.FilterQuery;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.Map;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IntRange {
-  /**
-   * Gets the minimum value.
-   *
-   * <p>This may be the same as {@link #max()}.</p>
-   *
-   * @return the minimum value
-   */
-  int min();
+public final class DefaultedFilteredIntRangeListImpl implements DefaultedFilteredIntRangeList {
+  private final List<FilterLinked<IntRange>> list;
+  private final IntRange defaultValue;
 
-  /**
-   * Gets the maximum value.
-   *
-   * <p>This may be the same as {@link #min()}.</p>
-   *
-   * @return the maximum value
-   */
-  int max();
-
-  /**
-   * Tests if this range contains {@code value}.
-   *
-   * @param value the value
-   * @return {@code true} if this range contains the value, {@code false} otherwise
-   */
-  default boolean contains(final int value) {
-    return value >= this.min() && value <= this.max();
+  public DefaultedFilteredIntRangeListImpl(final List<FilterLinked<IntRange>> list, final IntRange defaultValue) {
+    this.list = list;
+    this.defaultValue = defaultValue;
   }
 
-  /**
-   * Gets a random value within this range.
-   *
-   * @param random the random
-   * @return the value
-   */
-  int random(final Random random);
-
-  interface Filtered extends IntRange, com.almuradev.droplet.component.filter.Filtered {
-    @Nullable
-    static <T> IntRange cachingSearch(final DefaultedFilteredIntRangeList list, final Map<T, IntRange> map, final T biome, final FilterQuery query) {
-      /* @Nullable */ IntRange found = list.oneOrDefault(query);
-      if(found == null) {
-        found = list.oneOrDefault(query);
-        if(found != null) {
-          map.put(biome, found);
-        }
+  @Nullable
+  @Override
+  public IntRange oneOrDefault(final FilterQuery query) {
+    for(final FilterLinked<IntRange> entry : this.list) {
+      if(entry.test(query)) {
+        return entry.value();
       }
-      return found;
+    }
+    return this.defaultValue;
+  }
+
+  static class Builder implements DefaultedFilteredIntRangeList.Builder {
+    private final List<FilterLinked<IntRange>> filtered = new ArrayList<>();
+    private IntRange defaultValue;
+
+    @Override
+    public void filtered(final FilterLinked<IntRange> filtered) {
+      this.filtered.add(filtered);
+    }
+
+    @Override
+    public void defaultValue(final IntRange defaultValue) {
+      this.defaultValue = defaultValue;
+    }
+
+    @Override
+    public DefaultedFilteredIntRangeList build() {
+      return new DefaultedFilteredIntRangeListImpl(this.filtered, this.defaultValue);
     }
   }
 }
