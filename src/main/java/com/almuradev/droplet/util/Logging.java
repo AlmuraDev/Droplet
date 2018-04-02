@@ -24,7 +24,7 @@
 package com.almuradev.droplet.util;
 
 import com.google.common.base.Strings;
-import net.kyori.blizzard.NonNegative;
+import org.checkerframework.checker.index.qual.NonNegative;
 
 /**
  * Some logging utilities.

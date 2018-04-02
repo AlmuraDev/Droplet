@@ -24,27 +24,26 @@
 package com.almuradev.droplet.parser;
 
 import net.kyori.xml.XMLException;
+import net.kyori.xml.node.Node;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * An exception that can occur while parsing.
  */
 public class ParserException extends XMLException {
-  public ParserException() {
-  }
-
   public ParserException(final String message) {
     super(message);
+  }
+
+  public ParserException(@Nullable final Node node, final String message) {
+    super(node, message);
   }
 
   public ParserException(final String message, final Throwable cause) {
     super(message, cause);
   }
 
-  public ParserException(final Throwable cause) {
-    super(cause);
-  }
-
-  public ParserException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
+  public ParserException(@Nullable final Node node, final String message, @Nullable final Throwable cause) {
+    super(node, message, cause);
   }
 }
