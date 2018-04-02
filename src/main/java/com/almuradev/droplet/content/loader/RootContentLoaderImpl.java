@@ -37,6 +37,7 @@ import com.almuradev.droplet.util.Logging;
 import com.google.common.collect.MoreCollectors;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.node.Node;
+import org.jdom2.Element;
 import org.slf4j.Logger;
 
 import java.util.HashMap;
@@ -68,11 +69,14 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
     this.logger.debug("{}Parsing {} content...", Logging.indent(1), this.type.id());
     final long entries = this.foundContent.entries().stream().peek(entry -> {
       this.featureContext.set(entry.context());
-      final Node rootNode = Node.of(entry.rootElement());
+      final Element rootElement = entry.rootElement();
+      final Node rootNode = Node.of(rootElement);
       this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(rootNode, entry.builder())));
-      final Node node = Node.of(entry.rootElement().getChild(entry.rootType().rootElement()));
-      this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
-      this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+      rootElement.getChildren(entry.rootType().rootElement()).forEach(child -> {
+        final Node node = Node.of(child);
+        this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
+        this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+      });
     }).count();
     this.featureContext.set(null);
     this.logger.debug("{}{} {} parsed", Logging.indent(2), entries, entries == 1 ? "entry" : "entries");
