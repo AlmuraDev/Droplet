@@ -23,22 +23,25 @@
  */
 package com.almuradev.droplet.content.loader.finder;
 
+import com.almuradev.droplet.content.feature.context.FeatureContext;
+import com.almuradev.droplet.content.feature.context.FeatureContextImpl;
+import com.almuradev.droplet.content.type.Content;
 import com.almuradev.droplet.content.type.ContentType;
 
-import java.util.List;
+public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> implements FoundContentEntry<R, C> {
+  private final FeatureContext context = new FeatureContextImpl();
+  private Content result;
 
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final List<FoundContentEntry<R, C>> entries;
-
-  public FoundContent(final List<FoundContentEntry<R, C>> entries) {
-    this.entries = entries;
+  @Override
+  public FeatureContext context() {
+    return this.context;
   }
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return this.entries;
-  }
-
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.add((FoundContentEntry<R, C>) entry);
+  @Override
+  public Content result() {
+    if(this.result == null) {
+      this.result = this.builder().build();
+    }
+    return this.result;
   }
 }

@@ -23,22 +23,35 @@
  */
 package com.almuradev.droplet.content.loader.finder;
 
+import com.almuradev.droplet.content.feature.context.FeatureContext;
+import com.almuradev.droplet.content.type.Content;
+import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
+import com.almuradev.droplet.registry.RegistryKey;
+import org.jdom2.Element;
 
-import java.util.List;
+import java.nio.file.Path;
 
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final List<FoundContentEntry<R, C>> entries;
+public interface FoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> {
+  String namespace();
 
-  public FoundContent(final List<FoundContentEntry<R, C>> entries) {
-    this.entries = entries;
-  }
+  RegistryKey key();
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return this.entries;
-  }
+  R rootType();
 
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.add((FoundContentEntry<R, C>) entry);
+  C childType();
+
+  Path absolutePath();
+
+  Element rootElement();
+
+  FeatureContext context();
+
+  ContentBuilder builder();
+
+  Content result();
+
+  default <B> B result(final Class<B> resultType) {
+    return resultType.cast(this.result());
   }
 }

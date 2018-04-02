@@ -23,22 +23,51 @@
  */
 package com.almuradev.droplet.content.loader.finder;
 
+import com.almuradev.droplet.content.loader.ChildContentLoader;
+import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 
-import java.util.List;
+import java.nio.file.Path;
 
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final List<FoundContentEntry<R, C>> entries;
+import javax.inject.Provider;
 
-  public FoundContent(final List<FoundContentEntry<R, C>> entries) {
-    this.entries = entries;
+public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C extends ContentType.Child> implements ContentVisitor<R, C> {
+  private final FoundContentBuilder<R, C> builder;
+
+  protected AbstractContentVisitor(final FoundContentBuilder<R, C> builder) {
+    this.builder = builder;
   }
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return this.entries;
+  @Override
+  public void visitCore(final Path path) {
   }
 
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.add((FoundContentEntry<R, C>) entry);
+  @Override
+  public void visitNamespace(final Path path) {
+    this.builder.namespace(path.getFileName().toString(), path);
+  }
+
+  @Override
+  public void visitContent(final Path path) {
+  }
+
+  @Override
+  public void visitRoot(final R type, final Path path) {
+    this.builder.root(type, path);
+  }
+
+  @Override
+  public void visitChild(final ChildContentLoader<C> loader, final C type, final Path path) {
+    this.builder.child(loader, type, path);
+  }
+
+  @Override
+  public void visitEntry(final Path path, final Provider<ContentBuilder> builder) {
+    this.builder.entry(path, builder);
+  }
+
+  @Override
+  public FoundContent<R, C> foundContent() {
+    return this.builder.build();
   }
 }
