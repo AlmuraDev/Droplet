@@ -25,16 +25,46 @@ package com.almuradev.droplet.content.loader.finder;
 
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.feature.context.FeatureContextImpl;
+import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.Content;
 import com.almuradev.droplet.content.type.ContentType;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> implements FoundContentEntry<R, C> {
   private final FeatureContext context = new FeatureContextImpl();
+  private final R rootType;
+  private final C childType;
+  @Nullable private ContentSpec spec;
   private Content result;
+
+  protected AbstractFoundContentEntry(final R rootType, final C childType) {
+    this.rootType = rootType;
+    this.childType = childType;
+  }
+
+  @Override
+  public R rootType() {
+    return this.rootType;
+  }
+
+  @Override
+  public C childType() {
+    return this.childType;
+  }
 
   @Override
   public FeatureContext context() {
     return this.context;
+  }
+
+  @Override
+  public ContentSpec spec() {
+    if(this.spec == null) {
+      this.spec = ContentSpec.parse(requireNonNull(this.rootElement().getAttribute("spec"), "missing spec attribute").getValue());
+    }
+    return this.spec;
   }
 
   @Override
