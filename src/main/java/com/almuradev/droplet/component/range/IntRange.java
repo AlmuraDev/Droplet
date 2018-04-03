@@ -49,6 +49,16 @@ public interface IntRange {
   int max();
 
   /**
+   * Tests if this range contains {@code that}.
+   *
+   * @param that the other range
+   * @return {@code true} if this range contains {@code that}, {@code false} otherwise
+   */
+  default boolean contains(final IntRange that) {
+    return that.min() >= this.min() && that.max() <= this.max();
+  }
+
+  /**
    * Tests if this range contains {@code value}.
    *
    * @param value the value
