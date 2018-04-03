@@ -25,6 +25,7 @@ package com.almuradev.droplet.registry.reference;
 
 import com.almuradev.droplet.registry.Registry;
 import com.almuradev.droplet.registry.RegistryComputable;
+import com.google.common.base.MoreObjects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ComputableRegistryReference<V> extends LazyRegistryReference<V> {
@@ -44,5 +45,14 @@ public final class ComputableRegistryReference<V> extends LazyRegistryReference<
       this.registry.put(this.computable.registryKey(), value);
     }
     return value;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("registry", this.registry)
+      .add("computable", this.computable)
+      .add("valuePresent", this.valuePresent())
+      .toString();
   }
 }

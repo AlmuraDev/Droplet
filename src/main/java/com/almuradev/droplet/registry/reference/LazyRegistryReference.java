@@ -42,4 +42,8 @@ public abstract class LazyRegistryReference<V> implements RegistryReference<V> {
   }
 
   protected abstract V load();
+
+  protected final boolean valuePresent() {
+    return this.value != null;
+  }
 }

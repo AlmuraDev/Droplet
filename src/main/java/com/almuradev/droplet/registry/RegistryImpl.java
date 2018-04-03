@@ -23,6 +23,7 @@
  */
 package com.almuradev.droplet.registry;
 
+import com.google.common.base.MoreObjects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
@@ -45,5 +46,12 @@ public class RegistryImpl<T> implements Registry<T> {
   @Override
   public void put(final RegistryKey key, final T value) {
     this.map.put(key, value);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .addValue(this.map)
+      .toString();
   }
 }

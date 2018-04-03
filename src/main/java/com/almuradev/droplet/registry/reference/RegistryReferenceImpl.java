@@ -25,6 +25,7 @@ package com.almuradev.droplet.registry.reference;
 
 import com.almuradev.droplet.registry.Registry;
 import com.almuradev.droplet.registry.RegistryKey;
+import com.google.common.base.MoreObjects;
 
 public final class RegistryReferenceImpl<V> extends LazyRegistryReference<V> {
   private final Registry<V> registry;
@@ -38,5 +39,14 @@ public final class RegistryReferenceImpl<V> extends LazyRegistryReference<V> {
   @Override
   protected V load() {
     return this.registry.get(this.key);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("registry", this.registry)
+      .add("key", this.key)
+      .add("valuePresent", this.valuePresent())
+      .toString();
   }
 }
