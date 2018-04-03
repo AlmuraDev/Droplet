@@ -29,8 +29,14 @@ package com.almuradev.droplet.component.filter;
  * @param <Q> the query type
  */
 public interface AbstractFilter<Q extends FilterQuery> extends Filter {
+  boolean canQuery(final FilterQuery query);
+
   @Override
   default boolean test(final FilterQuery query) {
+    // Prevent cast exceptions if the query type is not accepted
+    if(!this.canQuery(query)) {
+      return false;
+    }
     return this.testInternal((Q) query);
   }
 
