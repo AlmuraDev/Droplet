@@ -26,10 +26,10 @@ package com.almuradev.droplet.content.loader.finder;
 import com.almuradev.droplet.content.loader.ChildContentLoader;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Provider;
 
@@ -41,7 +41,7 @@ public abstract class AbstractFoundContentBuilder<R extends ContentType.Root<C>,
   private ChildContentLoader<C> childLoader;
   protected C child;
   protected Path childPath;
-  protected final List<FoundContentEntry<R, C>> entries = new ArrayList<>();
+  protected final ListMultimap<C, FoundContentEntry<R, C>> entries = ArrayListMultimap.create();
 
   @Override
   public void namespace(final String namespace, final Path path) {
@@ -66,7 +66,7 @@ public abstract class AbstractFoundContentBuilder<R extends ContentType.Root<C>,
   public void entry(final Path path, final Provider<ContentBuilder> builder) {
     final FoundContentEntry<R, C> entry = this.createEntry(path, builder);
     this.childLoader.foundContent().offer(entry);
-    this.entries.add(entry);
+    this.entries.put(entry.childType(), entry);
   }
 
   protected abstract FoundContentEntry<R, C> createEntry(final Path path, final Provider<ContentBuilder> builder);

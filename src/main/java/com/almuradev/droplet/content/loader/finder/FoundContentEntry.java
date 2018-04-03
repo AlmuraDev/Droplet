@@ -24,6 +24,7 @@
 package com.almuradev.droplet.content.loader.finder;
 
 import com.almuradev.droplet.content.feature.context.FeatureContext;
+import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.Content;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
@@ -44,6 +45,8 @@ public interface FoundContentEntry<R extends ContentType.Root<C>, C extends Cont
   Path absolutePath();
 
   Element rootElement();
+
+  ContentSpec spec();
 
   FeatureContext context();
 

@@ -21,37 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.content.loader.finder;
+package com.almuradev.droplet.content.spec;
 
-import com.almuradev.droplet.content.type.ContentType;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
+public interface ContentSpec {
+  /**
+   * The current droplet specification.
+   */
+  ContentSpec CURRENT = new ContentSpecImpl(1, 0, 0);
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final ListMultimap<C, FoundContentEntry<R, C>> entries;
-
-  public FoundContent() {
-    this(ArrayListMultimap.create());
+  static ContentSpec parse(final String string) {
+    final String[] parts = string.split("\\.");
+    if(parts.length != 3) {
+      throw new IllegalArgumentException("Expected 'major.minor.patch', got '" + string + '\'');
+    }
+    return new ContentSpecImpl(
+      Integer.parseInt(parts[0]),
+      Integer.parseInt(parts[1]),
+      Integer.parseInt(parts[2])
+    );
   }
 
-  public FoundContent(final ListMultimap<C, FoundContentEntry<R, C>> entries) {
-    this.entries = entries;
-  }
+  int major();
 
-  public List<FoundContentEntry<R, C>> entries(final C type) {
-    return this.entries.get(type);
-  }
+  int minor();
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream).collect(Collectors.toList());
-  }
+  int patch();
 
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.put(entry.childType(), (FoundContentEntry<R, C>) entry);
+  default boolean atLeast(final ContentSpec that) {
+    return this.major() >= that.major()
+      && this.minor() >= that.minor()
+      && this.patch() >= that.patch();
   }
 }

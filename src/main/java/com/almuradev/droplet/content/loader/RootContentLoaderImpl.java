@@ -31,6 +31,7 @@ import com.almuradev.droplet.content.loader.finder.ContentFinder;
 import com.almuradev.droplet.content.loader.finder.ContentVisitor;
 import com.almuradev.droplet.content.loader.finder.FoundContent;
 import com.almuradev.droplet.content.processor.Processor;
+import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 import com.almuradev.droplet.util.Logging;
@@ -67,17 +68,29 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
   @Override
   public final void parse() {
     this.logger.debug("{}Parsing {} content...", Logging.indent(1), this.type.id());
-    final long entries = this.foundContent.entries().stream().peek(entry -> {
-      this.featureContext.set(entry.context());
-      final Element rootElement = entry.rootElement();
-      final Node rootNode = Node.of(rootElement);
-      this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(rootNode, entry.builder())));
-      rootElement.getChildren(entry.rootType().rootElement()).forEach(child -> {
-        final Node node = Node.of(child);
-        this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
-        this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
-      });
-    }).count();
+
+    final long entries = this.children.stream()
+      .map(ChildContentLoader::type)
+      .filter(child -> !this.foundContent.entries(child).isEmpty())
+      .mapToLong(child -> {
+        this.logger.debug("{}Parsing {} content...", Logging.indent(2), child.id());
+        return this.foundContent.entries(child).stream().peek(entry -> {
+          this.logger.debug("{}Parsing {}", Logging.indent(3), entry.toString());
+          this.featureContext.set(entry.context());
+          final Element rootElement = entry.rootElement();
+          if(!entry.spec().atLeast(ContentSpec.CURRENT)) {
+            this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(4), entry.spec(), ContentSpec.CURRENT);
+            return;
+          }
+          final Node rootNode = Node.of(rootElement);
+          this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(rootNode, entry.builder())));
+          rootElement.getChildren(entry.rootType().rootElement()).forEach(child2 -> {
+            final Node node = Node.of(child2);
+            this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
+            this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+          });
+        }).count();
+      }).sum();
     this.featureContext.set(null);
     this.logger.debug("{}{} {} parsed", Logging.indent(2), entries, entries == 1 ? "entry" : "entries");
   }

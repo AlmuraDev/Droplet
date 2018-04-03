@@ -21,37 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.content.loader.finder;
+package com.almuradev.droplet.content.spec;
 
-import com.almuradev.droplet.content.type.ContentType;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
+public final class ContentSpecImpl implements ContentSpec {
+  private final int major;
+  private final int minor;
+  private final int patch;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final ListMultimap<C, FoundContentEntry<R, C>> entries;
-
-  public FoundContent() {
-    this(ArrayListMultimap.create());
+  ContentSpecImpl(final int major, final int minor, final int patch) {
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
   }
 
-  public FoundContent(final ListMultimap<C, FoundContentEntry<R, C>> entries) {
-    this.entries = entries;
+  @Override
+  public int major() {
+    return this.major;
   }
 
-  public List<FoundContentEntry<R, C>> entries(final C type) {
-    return this.entries.get(type);
+  @Override
+  public int minor() {
+    return this.minor;
   }
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+  @Override
+  public int patch() {
+    return this.patch;
   }
 
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.put(entry.childType(), (FoundContentEntry<R, C>) entry);
+  @Override
+  public String toString() {
+    return this.major + "." + this.minor + "." + this.patch;
   }
 }

@@ -44,4 +44,9 @@ public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C
     }
     return this.result;
   }
+
+  @Override
+  public String toString() {
+    return this.key().toString() + " (" + this.absolutePath() + ')';
+  }
 }

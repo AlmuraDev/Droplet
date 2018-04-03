@@ -29,7 +29,6 @@ import com.almuradev.droplet.content.processor.Processor;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -39,7 +38,7 @@ public class ChildContentLoaderImpl<C extends ContentType.Child> implements Chil
   @Inject private C type;
   @Inject private Provider<ContentBuilder> builder;
   @ForChild @Inject private Set<Processor> processors;
-  private final FoundContent<?, C> foundContent = new FoundContent<>(new ArrayList<>());
+  private final FoundContent<?, C> foundContent = new FoundContent<>();
 
   @Override
   public C type() {
