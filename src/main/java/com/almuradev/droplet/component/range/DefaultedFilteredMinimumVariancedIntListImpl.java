@@ -43,7 +43,7 @@ public class DefaultedFilteredMinimumVariancedIntListImpl implements DefaultedFi
   @Override
   public MinimumVariancedInt oneOrDefault(final FilterQuery query) {
     for(final FilterLinked<MinimumVariancedInt> entry : this.filtered) {
-      if(entry.test(query)) {
+      if(entry.query(query).allowed()) {
         return entry.value();
       }
     }

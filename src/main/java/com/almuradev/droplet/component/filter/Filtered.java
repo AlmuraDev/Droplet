@@ -26,7 +26,7 @@ package com.almuradev.droplet.component.filter;
 public interface Filtered {
   Filter filter();
 
-  default boolean filterTest(final FilterQuery query) {
-    return this.filter().test(query);
+  default FilterResponse filterTest(final FilterQuery query) {
+    return this.filter().query(query);
   }
 }

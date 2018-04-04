@@ -25,6 +25,7 @@ package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
 import com.almuradev.droplet.component.filter.FilterQuery;
+import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.almuradev.droplet.content.feature.context.Feature;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
@@ -41,8 +42,8 @@ public final class ReferenceFilter extends AbstractSingleFilter implements Featu
   }
 
   @Override
-  public boolean test(final FilterQuery query) {
-    return this.filter.test(query);
+  public FilterResponse query(final FilterQuery query) {
+    return this.filter.query(query);
   }
 
   @Override

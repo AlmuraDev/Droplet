@@ -43,7 +43,7 @@ public final class DefaultedFilteredIntRangeListImpl implements DefaultedFiltere
   @Override
   public IntRange oneOrDefault(final FilterQuery query) {
     for(final FilterLinked<IntRange> entry : this.list) {
-      if(entry.test(query)) {
+      if(entry.query(query).allowed()) {
         return entry.value();
       }
     }

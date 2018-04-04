@@ -21,38 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component.filter.impl;
+package com.almuradev.droplet.component.filter;
 
-import com.almuradev.droplet.component.filter.Filter;
-import com.almuradev.droplet.component.filter.FilterQuery;
-import com.almuradev.droplet.component.filter.FilterResponse;
-import com.almuradev.droplet.component.filter.FilterTypeParser;
-import com.almuradev.droplet.parser.Parser;
-import net.kyori.xml.node.Node;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-public final class AllFilter extends AbstractMultipleFilter {
-  public AllFilter(final List<Filter> filters) {
-    super(filters);
-  }
-
-  @Override
-  public FilterResponse query(final FilterQuery query) {
-    return this.query(query, FilterResponse.DENY, FilterResponse.ALLOW);
-  }
-
-  @Singleton
-  public static final class ParserImpl implements FilterTypeParser<AllFilter> {
-    @Inject private Parser<Filter> parser;
-
+public enum FilterResponse {
+  ALLOW {
     @Override
-    public AllFilter throwingParse(final Node node) {
-      return new AllFilter(this.parser.parse(node.elements()).collect(Collectors.toList()));
+    public FilterResponse inverse() {
+      return DENY;
     }
+  },
+  DENY {
+    @Override
+    public FilterResponse inverse() {
+      return ALLOW;
+    }
+  },
+  ABSTAIN {
+    @Override
+    public FilterResponse inverse() {
+      return ABSTAIN;
+    }
+  };
+
+  public abstract FilterResponse inverse();
+
+  public boolean allowed() {
+    return this == ALLOW;
+  }
+
+  public static FilterResponse from(final boolean flag) {
+    return flag ? ALLOW : DENY;
   }
 }

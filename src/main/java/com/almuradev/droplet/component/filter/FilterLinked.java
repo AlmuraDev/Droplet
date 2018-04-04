@@ -34,8 +34,8 @@ public final class FilterLinked<V> {
     this.value = value;
   }
 
-  public boolean test(final FilterQuery query) {
-    return this.filter.test(query);
+  public FilterResponse query(final FilterQuery query) {
+    return this.filter.query(query);
   }
 
   public V value() {
@@ -43,7 +43,7 @@ public final class FilterLinked<V> {
   }
 
   public void when(final FilterQuery query, final Consumer<V> consumer) {
-    if(this.test(query)) {
+    if(this.query(query).allowed()) {
       consumer.accept(this.value());
     }
   }

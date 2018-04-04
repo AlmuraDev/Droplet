@@ -24,6 +24,8 @@
 package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
+import com.almuradev.droplet.component.filter.FilterQuery;
+import com.almuradev.droplet.component.filter.FilterResponse;
 
 import java.util.List;
 
@@ -32,5 +34,18 @@ public abstract class AbstractMultipleFilter implements Filter {
 
   protected AbstractMultipleFilter(final List<Filter> filters) {
     this.filters = filters;
+  }
+
+  protected FilterResponse query(final FilterQuery query, final FilterResponse wanted, final FilterResponse unmatchedTarget) {
+    FilterResponse unmatchedResponse = FilterResponse.ABSTAIN;
+    for(Filter filter : this.filters) {
+      final FilterResponse response = filter.query(query);
+      if(response == wanted) {
+        return response;
+      } else if(response == unmatchedTarget) {
+        unmatchedResponse = response;
+      }
+    }
+    return unmatchedResponse;
   }
 }

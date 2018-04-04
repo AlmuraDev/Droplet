@@ -25,6 +25,7 @@ package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
 import com.almuradev.droplet.component.filter.FilterQuery;
+import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.almuradev.droplet.parser.Parser;
 import net.kyori.xml.node.Node;
@@ -41,13 +42,8 @@ public final class AnyFilter extends AbstractMultipleFilter {
   }
 
   @Override
-  public boolean test(final FilterQuery query) {
-    for(final Filter filter : this.filters) {
-      if(filter.test(query)) {
-        return true;
-      }
-    }
-    return false;
+  public FilterResponse query(final FilterQuery query) {
+    return this.query(query, FilterResponse.ALLOW, FilterResponse.DENY);
   }
 
   @Singleton

@@ -25,6 +25,7 @@ package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
 import com.almuradev.droplet.component.filter.FilterQuery;
+import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.almuradev.droplet.parser.Parser;
 import com.google.common.collect.MoreCollectors;
@@ -39,8 +40,8 @@ public final class NotFilter extends AbstractSingleFilter {
   }
 
   @Override
-  public boolean test(final FilterQuery query) {
-    return !this.filter.test(query);
+  public FilterResponse query(final FilterQuery query) {
+    return this.filter.query(query).inverse();
   }
 
   @Singleton

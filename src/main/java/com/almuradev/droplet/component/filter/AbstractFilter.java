@@ -32,13 +32,13 @@ public interface AbstractFilter<Q extends FilterQuery> extends Filter {
   boolean canQuery(final FilterQuery query);
 
   @Override
-  default boolean test(final FilterQuery query) {
+  default FilterResponse query(final FilterQuery query) {
     // Prevent cast exceptions if the query type is not accepted
     if(!this.canQuery(query)) {
-      return false;
+      return FilterResponse.ABSTAIN;
     }
-    return this.testInternal((Q) query);
+    return this.queryInternal((Q) query);
   }
 
-  boolean testInternal(final Q query);
+  FilterResponse queryInternal(final Q query);
 }

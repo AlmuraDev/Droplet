@@ -43,7 +43,7 @@ public final class DefaultedFilteredDoubleRangeListImpl implements DefaultedFilt
   @Override
   public DoubleRange oneOrDefault(final FilterQuery query) {
     for(final FilterLinked<DoubleRange> entry : this.filtered) {
-      if(entry.test(query)) {
+      if(entry.query(query).allowed()) {
         return entry.value();
       }
     }

@@ -24,5 +24,13 @@
 package com.almuradev.droplet.component.filter;
 
 public interface Filter {
-  boolean test(final FilterQuery query);
+  FilterResponse query(final FilterQuery query);
+
+  default boolean allowed(final FilterQuery query) {
+    return this.query(query) == FilterResponse.ALLOW;
+  }
+
+  default boolean denied(final FilterQuery query) {
+    return this.query(query) == FilterResponse.DENY;
+  }
 }

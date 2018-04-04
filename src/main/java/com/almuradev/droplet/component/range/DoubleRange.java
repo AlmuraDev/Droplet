@@ -106,7 +106,7 @@ public interface DoubleRange {
 
   static Filtered matchQueryOrRandom(final List<Filtered> items, final FilterQuery query) {
     for(final Filtered filtered : items) {
-      if(filtered.filterTest(query)) {
+      if(filtered.filterTest(query).allowed()) {
         return filtered;
       }
     }
