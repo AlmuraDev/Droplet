@@ -32,6 +32,7 @@ import com.almuradev.droplet.registry.RegistryKey;
 import org.jdom2.Element;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 public interface FoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> {
   String namespace();
@@ -56,5 +57,12 @@ public interface FoundContentEntry<R extends ContentType.Root<C>, C extends Cont
 
   default <B> B result(final Class<B> resultType) {
     return resultType.cast(this.result());
+  }
+
+  default <B> void whenResult(final Class<B> resultType, final Consumer<B> consumer) {
+    final Content result = this.result();
+    if(resultType.isInstance(result)) {
+      consumer.accept(resultType.cast(result));
+    }
   }
 }

@@ -29,7 +29,6 @@ import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.content.inject.GlobalBinder;
 import com.almuradev.droplet.content.loader.ContentManager;
 import com.almuradev.droplet.content.loader.ContentManagerImpl;
-import com.almuradev.droplet.content.type.ContentTypeModule;
 import com.almuradev.droplet.inject.DropletBinder;
 import com.google.inject.TypeLiteral;
 import net.kyori.violet.AbstractModule;
@@ -40,7 +39,6 @@ public final class ContentModule extends AbstractModule implements DropletBinder
     this.bind(ContentManager.class).to(ContentManagerImpl.class);
     this.bind(new TypeLiteral<DynamicProvider<FeatureContext>>() {}).toInstance(new DynamicProvider<>());
     this.bindFacet().to(ContentManagerImpl.class);
-    this.install(new ContentTypeModule());
     this.bindGlobalProcessor(RootFilterProcessor.class);
   }
 }
