@@ -36,9 +36,9 @@ public final class FilterModule extends AbstractModule implements FilterBinder, 
     this.bindParser(Filter.class).to(RootFilterParserImpl.class);
     this.bind(FilterParser.class).to(RootFilterParserImpl.class);
 
-    this.bindFilter("all").to(AllFilter.ParserImpl.class);
-    this.bindFilter("any").to(AnyFilter.ParserImpl.class);
-    this.bindFilter("filter").to(ReferenceFilter.ParserImpl.class);
-    this.bindFilter("not").to(NotFilter.ParserImpl.class);
+    this.bindFilter("all").to(AllFilter.Parser.class);
+    this.bindFilter("any").to(AnyFilter.Parser.class);
+    this.bindFilter("filter").to(ReferenceFilter.Parser.class);
+    this.bindFilter("not").to(NotFilter.Parser.class);
   }
 }

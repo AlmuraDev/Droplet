@@ -24,10 +24,10 @@
 package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
+import com.almuradev.droplet.component.filter.FilterParser;
 import com.almuradev.droplet.component.filter.FilterQuery;
 import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
-import com.almuradev.droplet.parser.Parser;
 import net.kyori.xml.node.Node;
 
 import java.util.List;
@@ -47,8 +47,8 @@ public final class AnyFilter extends AbstractMultipleFilter {
   }
 
   @Singleton
-  public static final class ParserImpl implements FilterTypeParser<AnyFilter> {
-    @Inject private Parser<Filter> parser;
+  public static final class Parser implements FilterTypeParser<AnyFilter> {
+    @Inject private FilterParser parser;
 
     @Override
     public AnyFilter throwingParse(final Node node) {

@@ -24,7 +24,6 @@
 package com.almuradev.droplet.component.filter;
 
 import com.almuradev.droplet.content.processor.Processor;
-import com.google.common.collect.MoreCollectors;
 import net.kyori.xml.node.Node;
 
 import java.util.Comparator;
@@ -43,7 +42,7 @@ public final class RootFilterProcessor implements Processor {
 
   @Override
   public void process(final Node node, final Object builder) {
-    node.nodes("filters").collect(MoreCollectors.toOptional()).ifPresent(this::process);
+    node.nodes("filters").forEach(this::process);
   }
 
   protected void process(final Node node) {

@@ -52,11 +52,11 @@ public final class ReferenceFilter extends AbstractSingleFilter implements Featu
   }
 
   @Singleton
-  public static final class ParserImpl implements FilterTypeParser<ReferenceFilter> {
+  public static final class Parser implements FilterTypeParser<ReferenceFilter> {
     private final DynamicProvider<FeatureContext> featureContext;
 
     @Inject
-    private ParserImpl(final DynamicProvider<FeatureContext> featureContext) {
+    private Parser(final DynamicProvider<FeatureContext> featureContext) {
       this.featureContext = featureContext;
     }
 
