@@ -58,7 +58,7 @@ public class MinimumVariancedInt {
 
     public static int matchQueryOrRandom(final List<Filtered> filtereds, final FilterQuery query, final Random random) {
       for(final Filtered filtered : filtereds) {
-        if(filtered.filterTest(query).allowed()) {
+        if(filtered.filter().allowed(query)) {
           return filtered.get(random);
         }
       }

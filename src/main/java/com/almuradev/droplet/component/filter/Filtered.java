@@ -25,8 +25,4 @@ package com.almuradev.droplet.component.filter;
 
 public interface Filtered {
   Filter filter();
-
-  default FilterResponse filterTest(final FilterQuery query) {
-    return this.filter().query(query);
-  }
 }
