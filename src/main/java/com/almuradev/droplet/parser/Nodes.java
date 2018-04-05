@@ -42,4 +42,11 @@ public final class Nodes {
   public static Node requireSingle(final Stream<Node> stream) {
     return stream.collect(MoreCollectors.onlyElement());
   }
+
+  public static Node firstNonEmpty(final Node node, final String child) {
+    if(!node.value().isEmpty()) {
+      return node;
+    }
+    return node.nodes(child).collect(MoreCollectors.onlyElement());
+  }
 }

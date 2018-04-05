@@ -23,7 +23,9 @@
  */
 package com.almuradev.droplet.component.filter;
 
-public interface Filter {
+import com.almuradev.droplet.content.feature.Feature;
+
+public interface Filter extends Feature {
   FilterResponse query(final FilterQuery query);
 
   default boolean allowed(final FilterQuery query) {

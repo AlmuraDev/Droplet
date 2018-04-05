@@ -52,7 +52,6 @@ public final class ComputableRegistryReference<V> extends LazyRegistryReference<
     return MoreObjects.toStringHelper(this)
       .add("registry", this.registry)
       .add("computable", this.computable)
-      .add("valuePresent", this.valuePresent())
       .toString();
   }
 }

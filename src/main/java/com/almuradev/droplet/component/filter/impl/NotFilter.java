@@ -46,7 +46,12 @@ public final class NotFilter extends AbstractSingleFilter {
 
   @Singleton
   public static final class Parser implements FilterTypeParser<NotFilter> {
-    @Inject private FilterParser parser;
+    private final FilterParser parser;
+
+    @Inject
+    private Parser(final FilterParser parser) {
+      this.parser = parser;
+    }
 
     @Override
     public NotFilter throwingParse(final Node node) {

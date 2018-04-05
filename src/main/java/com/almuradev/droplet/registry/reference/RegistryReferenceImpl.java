@@ -44,9 +44,7 @@ public final class RegistryReferenceImpl<V> extends LazyRegistryReference<V> {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-      .add("registry", this.registry)
-      .add("key", this.key)
-      .add("valuePresent", this.valuePresent())
+      .addValue(this.key)
       .toString();
   }
 }

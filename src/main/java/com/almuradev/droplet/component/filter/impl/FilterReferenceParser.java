@@ -24,10 +24,7 @@
 package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.Filter;
-import com.almuradev.droplet.component.filter.FilterQuery;
-import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
-import com.almuradev.droplet.content.feature.context.Feature;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
 import net.kyori.xml.XMLException;
@@ -36,34 +33,18 @@ import net.kyori.xml.node.Node;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-public final class ReferenceFilter extends AbstractSingleFilter implements Feature {
-  public ReferenceFilter(final Filter filter) {
-    super(filter);
+@Singleton
+public final class FilterReferenceParser implements FilterTypeParser<Filter> {
+  private final DynamicProvider<FeatureContext> featureContext;
+
+  @Inject
+  private FilterReferenceParser(final DynamicProvider<FeatureContext> featureContext) {
+    this.featureContext = featureContext;
   }
 
   @Override
-  public FilterResponse query(final FilterQuery query) {
-    return this.filter.query(query);
-  }
-
-  @Override
-  public boolean canBeReferenced() {
-    return false;
-  }
-
-  @Singleton
-  public static final class Parser implements FilterTypeParser<ReferenceFilter> {
-    private final DynamicProvider<FeatureContext> featureContext;
-
-    @Inject
-    private Parser(final DynamicProvider<FeatureContext> featureContext) {
-      this.featureContext = featureContext;
-    }
-
-    @Override
-    public ReferenceFilter throwingParse(final Node node) throws XMLException {
-      final Node id = node.attribute("id").orElseThrow(() -> new XMLException("Could not find 'id' attribute for filter reference"));
-      return new ReferenceFilter(this.featureContext.get().find(Filter.class, id.value()).orElseThrow(() -> new XMLException("Could not find filter with id '" + id.value() + "'")));
-    }
+  public Filter throwingParse(final Node node) throws XMLException {
+    final Node id = node.attribute("id").orElseThrow(() -> new XMLException("Could not find 'id' attribute for filter reference"));
+    return this.featureContext.get().get(Filter.class, id.value());
   }
 }

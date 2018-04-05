@@ -30,5 +30,7 @@ public interface RootContentLoader<C extends ContentType.Child> extends ContentL
 
   void parse();
 
+  void validate();
+
   void queue();
 }

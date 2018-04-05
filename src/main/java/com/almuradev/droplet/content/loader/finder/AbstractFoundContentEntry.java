@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> implements FoundContentEntry<R, C> {
-  private final FeatureContext context = new FeatureContextImpl();
+  private final FeatureContext context = new FeatureContextImpl(this);
   private final R rootType;
   private final C childType;
   @Nullable private ContentSpec spec;

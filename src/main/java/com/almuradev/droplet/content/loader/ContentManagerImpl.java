@@ -48,6 +48,8 @@ public final class ContentManagerImpl implements ContentManager, Enableable {
     this.rootLoaders.forEach(RootContentLoader::discover);
     this.logger.debug("Parsing content...");
     this.rootLoaders.forEach(RootContentLoader::parse);
+    this.logger.debug("Validating content...");
+    this.rootLoaders.forEach(RootContentLoader::validate);
     this.logger.debug("Loading content...");
     this.rootLoaders.forEach(RootContentLoader::queue);
   }

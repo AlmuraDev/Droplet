@@ -100,6 +100,22 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
   }
 
   @Override
+  public final void validate() {
+    this.logger.debug("{}Validating {} content...", Logging.indent(1), this.type.id());
+    this.children.stream()
+      .map(ChildContentLoader::type)
+      .filter(child -> !this.foundContent.entries(child).isEmpty())
+      .forEach(child -> {
+        this.logger.debug("{}Validating {} content...", Logging.indent(2), child.id());
+        this.foundContent.entries(child).forEach(entry -> {
+          entry.context().validate().forEach(exception -> {
+            this.logger.error("{}{}", Logging.indent(3), exception.getMessage());
+          });
+        });
+      });
+  }
+
+  @Override
   public final void queue() {
     this.logger.debug("{}Queuing {} content...", Logging.indent(1), this.type.id());
   }

@@ -21,17 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.content.feature.context;
+package com.almuradev.droplet.content.feature;
 
-import net.kyori.xml.XMLException;
-import net.kyori.xml.node.Node;
-
-import java.util.List;
-
-public interface FeatureContext {
-  <F> F get(final Class<F> type, final String id);
-
-  <F> F add(final Class<F> type, final Node node, final F feature);
-
-  List<XMLException> validate();
+public interface Feature {
 }

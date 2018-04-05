@@ -21,11 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.content.feature.context;
+package com.almuradev.droplet.proxy;
 
-// It is optional to implement this interface, but is required in some cases (such as disabling referencing).
-public interface Feature {
-  default boolean canBeReferenced() {
-    return true;
-  }
+public interface Proxied {
 }

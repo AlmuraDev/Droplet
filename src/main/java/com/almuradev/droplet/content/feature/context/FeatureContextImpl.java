@@ -23,75 +23,122 @@
  */
 package com.almuradev.droplet.content.feature.context;
 
+import com.almuradev.droplet.content.loader.finder.FoundContentEntry;
+import com.almuradev.droplet.proxy.AbstractProxied;
+import com.almuradev.droplet.proxy.Proxied;
+import net.kyori.xml.XMLException;
+import net.kyori.xml.node.Node;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-public final class FeatureContextImpl implements FeatureContext {
-  private final Map<Class<?>, IdMap> byType = new HashMap<>();
+public class FeatureContextImpl implements FeatureContext {
+  private static final String ID_ATTRIBUTE_NAME = "id";
+  private final Map<String, Entry<?>> entriesById = new HashMap<>();
+  private final FoundContentEntry<?, ?> source;
 
-  @Override
-  public <F> Optional<F> find(final Class<F> type, final String id) {
-    /* @Nullable */ final Object feature = this.idMap(type).byId.get(id);
-    if(feature == null) {
-      return Optional.empty();
-    }
-    return Optional.of(type.cast(feature));
+  public FeatureContextImpl(final FoundContentEntry<?, ?> source) {
+    this.source = source;
   }
 
   @Override
-  public <F> F add(final Class<F> type, final FeatureId id, final F feature) {
-    this.idMap(type).addFeature(feature, id);
+  public <F> F get(final Class<F> type, final String id) {
+    return this.feature(type, id).get();
+  }
+
+  @Override
+  public <F> F add(final Class<F> type, final Node node, final F feature) {
+    return this.add(type, node.attribute(ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature);
+  }
+
+  private <F> F add(final Class<F> type, @Nullable final String id, final F feature) {
+    // Don't insert a proxied feature.
+    if(feature instanceof Proxied) {
+      return feature;
+    }
+
+    // This feature has an id, and can be referenced.
+    if(id != null) {
+      /* @Nullable */ final Entry<F> entry = this.feature(type, id);
+      if(!entry.virtual() && entry.feature != feature) {
+        throw new IllegalStateException(type.getName() + " with id " + id + " already defined as " + entry.feature + ", cannot redefine as " + feature);
+      }
+
+      entry.feature = feature;
+    }
+
     return feature;
   }
 
-  private IdMap idMap(final Class<?> type) {
-    return this.byType.computeIfAbsent(type, key -> new IdMap());
+  private <F> Entry<F> feature(final Class<F> type, final String id) {
+    return (Entry<F>) this.entriesById.computeIfAbsent(id, key -> new Entry<>(type, id));
   }
 
-  private static class IdMap {
-    private final Map<String, Object> byId = new HashMap<>();
-    private final Map<String, Id> nextId = new HashMap<>();
-
-    <F> void addFeature(final F feature, final FeatureId id) {
-      if(feature instanceof Feature && !((Feature) feature).canBeReferenced()) {
-        return;
+  @Override
+  public List<XMLException> validate() {
+    final List<XMLException> exceptions = new ArrayList<>();
+    for(final Entry<?> entry : this.entriesById.values()) {
+      if(entry.virtual()) {
+        exceptions.add(new XMLException(Node.of(this.source.rootElement()), entry.type.getName() + " with id " + entry.id + " has not been defined"));
       }
-
-      /* @Nullable */ final Object oldFeature = this.byId.get(id.get());
-      final String stringId;
-      if(oldFeature != null) {
-        if(!id.auto()) {
-          throw new IllegalStateException("conflict in feature context: " + id.get() + " already defined as " + oldFeature + ", cannot redefine as " + feature);
-        }
-        stringId = this.nextId.computeIfAbsent(id.get(), Id::new).next();
-      } else {
-        stringId = !id.auto() ? id.get() : this.nextId.computeIfAbsent(id.get(), Id::new).next();
-      }
-      this.byId.put(stringId, feature);
     }
-
-    @Override
-    public String toString() {
-      return this.byId.toString();
-    }
+    return exceptions;
   }
 
   @Override
   public String toString() {
-    return this.byType.toString();
+    return this.entriesById.toString();
   }
 
-  private static class Id {
-    private final String id;
-    private int value = 1;
+  private static class Entry<F> {
+    final Class<F> type;
+    @Nullable final String id;
+    @Nullable F feature;
+    @Nullable F proxiedFeature;
 
-    private Id(String id) {
+    Entry(final Class<F> type, @Nullable final String id) {
+      this.type = type;
       this.id = id;
     }
 
-    public String next() {
-      return this.id + "-" + this.value++;
+    boolean virtual() {
+      return this.feature == null;
+    }
+
+    F get() {
+      if(this.feature != null) {
+        return this.feature;
+      }
+      return this.proxy();
+    }
+
+    F feature() {
+      if(this.feature == null) {
+        throw new IllegalStateException("feature of type " + this.type + " has not been provided for " + this.id);
+      }
+      return this.feature;
+    }
+
+    F proxy() {
+      if(this.proxiedFeature == null) {
+        class ProxiedFeature extends AbstractProxied {
+          @Nullable
+          @Override
+          protected Object object(final Method method) {
+            return Entry.this.feature();
+          }
+        }
+        this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), new Class<?>[]{
+          this.type,
+          Proxied.class
+        }, new ProxiedFeature());
+      }
+      return this.proxiedFeature;
     }
   }
 }
