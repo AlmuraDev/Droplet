@@ -36,7 +36,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 
-public abstract class AbstractProxied implements InvocationHandler, Proxied {
+public abstract class MethodHandleInvocationHandler implements InvocationHandler {
   private static final LoadingCache<Method, MethodHandle> SHARED_CACHE = CacheBuilder.newBuilder().build(CacheLoader.from(MoreMethodHandles::unreflect));
   private final Cache<Method, MethodHandle> cache = CacheBuilder.newBuilder().build();
 

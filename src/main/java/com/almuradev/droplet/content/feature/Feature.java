@@ -24,4 +24,5 @@
 package com.almuradev.droplet.content.feature;
 
 public interface Feature {
+  String ID_ATTRIBUTE_NAME = "id";
 }

@@ -44,7 +44,6 @@ public final class FilterReferenceParser implements FilterTypeParser<Filter> {
 
   @Override
   public Filter throwingParse(final Node node) throws XMLException {
-    final Node id = node.attribute("id").orElseThrow(() -> new XMLException("Could not find 'id' attribute for filter reference"));
-    return this.featureContext.get().get(Filter.class, id.value());
+    return this.featureContext.get().get(Filter.class, node);
   }
 }

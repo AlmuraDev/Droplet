@@ -23,8 +23,9 @@
  */
 package com.almuradev.droplet.content.feature.context;
 
-import com.almuradev.droplet.content.loader.finder.FoundContentEntry;
-import com.almuradev.droplet.proxy.AbstractProxied;
+import com.almuradev.droplet.content.feature.Feature;
+import com.almuradev.droplet.content.feature.ProxiedFeature;
+import com.almuradev.droplet.proxy.MethodHandleInvocationHandler;
 import com.almuradev.droplet.proxy.Proxied;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
@@ -38,12 +39,12 @@ import java.util.List;
 import java.util.Map;
 
 public class FeatureContextImpl implements FeatureContext {
-  private static final String ID_ATTRIBUTE_NAME = "id";
   private final Map<String, Entry<?>> entriesById = new HashMap<>();
-  private final FoundContentEntry<?, ?> source;
 
-  public FeatureContextImpl(final FoundContentEntry<?, ?> source) {
-    this.source = source;
+  @Override
+  public <F> F get(final Class<F> type, final Node node) throws XMLException {
+    final Node id = node.attribute(Feature.ID_ATTRIBUTE_NAME).orElseThrow(() -> new XMLException("Could not find '" + Feature.ID_ATTRIBUTE_NAME + "' attribute"));
+    return this.feature(type, id.value()).reference(node).get();
   }
 
   @Override
@@ -53,10 +54,11 @@ public class FeatureContextImpl implements FeatureContext {
 
   @Override
   public <F> F add(final Class<F> type, final Node node, final F feature) {
-    return this.add(type, node.attribute(ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature);
+    return this.add(type, node.attribute(Feature.ID_ATTRIBUTE_NAME).map(Node::value).orElse(null), feature);
   }
 
-  private <F> F add(final Class<F> type, @Nullable final String id, final F feature) {
+  @Override
+  public <F> F add(final Class<F> type, @Nullable final String id, final F feature) {
     // Don't insert a proxied feature.
     if(feature instanceof Proxied) {
       return feature;
@@ -84,7 +86,7 @@ public class FeatureContextImpl implements FeatureContext {
     final List<XMLException> exceptions = new ArrayList<>();
     for(final Entry<?> entry : this.entriesById.values()) {
       if(entry.virtual()) {
-        exceptions.add(new XMLException(Node.of(this.source.rootElement()), entry.type.getName() + " with id " + entry.id + " has not been defined"));
+        entry.references.forEach(reference -> exceptions.add(new XMLException(reference, "reference for " + entry.type.getName() + " with id " + entry.id + " has not been defined")));
       }
     }
     return exceptions;
@@ -99,6 +101,7 @@ public class FeatureContextImpl implements FeatureContext {
     final Class<F> type;
     @Nullable final String id;
     @Nullable F feature;
+    final List<Node> references = new ArrayList<>();
     @Nullable F proxiedFeature;
 
     Entry(final Class<F> type, @Nullable final String id) {
@@ -110,6 +113,11 @@ public class FeatureContextImpl implements FeatureContext {
       return this.feature == null;
     }
 
+    Entry<F> reference(final Node node) {
+      this.references.add(node);
+      return this;
+    }
+
     F get() {
       if(this.feature != null) {
         return this.feature;
@@ -117,28 +125,39 @@ public class FeatureContextImpl implements FeatureContext {
       return this.proxy();
     }
 
-    F feature() {
+    private F feature() {
       if(this.feature == null) {
         throw new IllegalStateException("feature of type " + this.type + " has not been provided for " + this.id);
       }
       return this.feature;
     }
 
-    F proxy() {
+    private F proxy() {
       if(this.proxiedFeature == null) {
-        class ProxiedFeature extends AbstractProxied {
+        class ProxiedFeatureImpl extends MethodHandleInvocationHandler {
           @Nullable
           @Override
           protected Object object(final Method method) {
             return Entry.this.feature();
           }
         }
-        this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), new Class<?>[]{
-          this.type,
-          Proxied.class
-        }, new ProxiedFeature());
+        this.proxiedFeature = (F) Proxy.newProxyInstance(this.type.getClassLoader(), this.proxyClasses(), new ProxiedFeatureImpl());
       }
       return this.proxiedFeature;
+    }
+
+    private Class<?>[] proxyClasses() {
+      final List<Class<?>> classes = new ArrayList<>();
+
+      classes.add(this.type);
+
+      if(Feature.class.isAssignableFrom(this.type)) {
+        classes.add(ProxiedFeature.class);
+      } else {
+        classes.add(Proxied.class);
+      }
+
+      return classes.toArray(new Class<?>[classes.size()]);
     }
   }
 }

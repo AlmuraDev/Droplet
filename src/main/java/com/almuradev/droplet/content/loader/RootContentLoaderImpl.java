@@ -34,6 +34,7 @@ import com.almuradev.droplet.content.processor.Processor;
 import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
+import com.almuradev.droplet.parser.Nodes;
 import com.almuradev.droplet.util.Logging;
 import com.google.common.collect.MoreCollectors;
 import net.kyori.lunar.exception.Exceptions;
@@ -109,7 +110,14 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
         this.logger.debug("{}Validating {} content...", Logging.indent(2), child.id());
         this.foundContent.entries(child).forEach(entry -> {
           entry.context().validate().forEach(exception -> {
-            this.logger.error("{}{}", Logging.indent(3), exception.getMessage());
+            final StringBuilder sb = new StringBuilder();
+            sb.append(entry.absolutePath().toString());
+            /* @Nullable */ final Node node = exception.node();
+            if(node != null) {
+              Nodes.appendLocation(node, sb);
+            }
+            sb.append(": ").append(exception.getMessage());
+            this.logger.error("{}{}", Logging.indent(3), sb.toString());
           });
         });
       });

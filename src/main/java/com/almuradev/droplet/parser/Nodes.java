@@ -24,7 +24,11 @@
 package com.almuradev.droplet.parser;
 
 import com.google.common.collect.MoreCollectors;
+import net.kyori.xml.node.AttributeNode;
+import net.kyori.xml.node.ElementNode;
 import net.kyori.xml.node.Node;
+import org.jdom2.Element;
+import org.jdom2.located.Located;
 
 import java.util.stream.Stream;
 
@@ -48,5 +52,16 @@ public final class Nodes {
       return node;
     }
     return node.nodes(child).collect(MoreCollectors.onlyElement());
+  }
+
+  public static void appendLocation(final Node node, final StringBuilder sb) {
+    if(node instanceof AttributeNode) {
+      appendLocation(Node.of(((AttributeNode) node).attribute().getParent()), sb);
+    } else if(node instanceof ElementNode) {
+      final Element element = ((ElementNode) node).element();
+      if(element instanceof Located) {
+        sb.append(" @ [line: ").append(((Located) element).getLine()).append(", column: ").append(((Located) element).getColumn()).append(']');
+      }
+    }
   }
 }

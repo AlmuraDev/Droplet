@@ -23,6 +23,7 @@
  */
 package com.almuradev.droplet.content.loader;
 
+import net.kyori.lunar.EvenMoreObjects;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -31,6 +32,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.located.LocatedJDOMFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +43,9 @@ import java.util.List;
 
 public final class DocumentFactory {
   private static final String INCLUDE_ELEMENT_NAME = "include";
-  private final SAXBuilder builder = new SAXBuilder();
+  private final SAXBuilder builder = EvenMoreObjects.make(new SAXBuilder(), builder -> {
+    builder.setJDOMFactory(new LocatedJDOMFactory());
+  });
   private final List<Path> includePaths;
 
   public DocumentFactory(final List<Path> includePaths) {

@@ -23,5 +23,8 @@
  */
 package com.almuradev.droplet.proxy;
 
+/**
+ * Something that has been proxied.
+ */
 public interface Proxied {
 }
