@@ -29,5 +29,5 @@ import com.almuradev.droplet.content.type.ContentType;
 import java.util.Set;
 
 public interface ContentFinder {
-  <C extends ContentType.Child, R extends ContentType.Root<C>, V extends ContentVisitor<R, C>> FoundContent<R, C> find(final V visitor, final R rootType, final Set<ChildContentLoader<C>> childrenTypes);
+  <C extends ContentType.Child, R extends ContentType.Root<C>> FoundContent<R, C> find(final R rootType, final Set<ChildContentLoader<C>> childrenTypes);
 }

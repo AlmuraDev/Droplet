@@ -26,25 +26,31 @@ package com.almuradev.droplet.content.loader.finder;
 import com.almuradev.droplet.content.loader.ChildContentLoader;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 import java.nio.file.Path;
 
 import javax.inject.Provider;
 
 public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C extends ContentType.Child> implements ContentVisitor<R, C> {
-  private final FoundContentBuilder<R, C> builder;
-
-  protected AbstractContentVisitor(final FoundContentBuilder<R, C> builder) {
-    this.builder = builder;
-  }
+  protected String namespace;
+  protected Path namespacePath;
+  protected R type;
+  protected Path typePath;
+  protected ChildContentLoader<C> childLoader;
+  protected C child;
+  protected Path childPath;
+  protected final ListMultimap<C, FoundContentEntry<R, C>> entries = ArrayListMultimap.create();
 
   @Override
-  public void visitCore(final Path path) {
+  public void visitRoot(final Path path) {
   }
 
   @Override
   public void visitNamespace(final Path path) {
-    this.builder.namespace(path.getFileName().toString(), path);
+    this.namespace = path.getFileName().toString();
+    this.namespacePath = path;
   }
 
   @Override
@@ -52,22 +58,29 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
   }
 
   @Override
-  public void visitRoot(final R type, final Path path) {
-    this.builder.root(type, path);
+  public void visitType(final R type, final Path path) {
+    this.type = type;
+    this.typePath = path;
   }
 
   @Override
   public void visitChild(final ChildContentLoader<C> loader, final C type, final Path path) {
-    this.builder.child(loader, type, path);
+    this.childLoader = loader;
+    this.child = type;
+    this.childPath = path;
   }
 
   @Override
   public void visitEntry(final Path path, final Provider<ContentBuilder> builder) {
-    this.builder.entry(path, builder);
+    final FoundContentEntry<R, C> entry = this.createEntry(path, builder);
+    this.childLoader.foundContent().offer(entry);
+    this.entries.put(entry.childType(), entry);
   }
+
+  protected abstract FoundContentEntry<R, C> createEntry(final Path path, final Provider<ContentBuilder> builder);
 
   @Override
   public FoundContent<R, C> foundContent() {
-    return this.builder.build();
+    return new FoundContent<>(this.entries);
   }
 }

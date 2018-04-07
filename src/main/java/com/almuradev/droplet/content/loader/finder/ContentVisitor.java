@@ -32,13 +32,13 @@ import java.nio.file.Path;
 import javax.inject.Provider;
 
 public interface ContentVisitor<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  void visitCore(final Path path);
+  void visitRoot(final Path path);
 
   void visitNamespace(final Path path);
 
   void visitContent(final Path path);
 
-  void visitRoot(final R type, final Path path);
+  void visitType(final R type, final Path path);
 
   void visitChild(final ChildContentLoader<C> loader, final C type, final Path path);
 

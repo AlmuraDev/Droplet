@@ -28,7 +28,6 @@ import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.content.inject.ForGlobal;
 import com.almuradev.droplet.content.inject.ForRoot;
 import com.almuradev.droplet.content.loader.finder.ContentFinder;
-import com.almuradev.droplet.content.loader.finder.ContentVisitor;
 import com.almuradev.droplet.content.loader.finder.FoundContent;
 import com.almuradev.droplet.content.processor.Processor;
 import com.almuradev.droplet.content.spec.ContentSpec;
@@ -61,10 +60,8 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
 
   @Override
   public final void discover() {
-    this.foundContent = this.finder.find(this.contentVisitor(), this.type, this.children);
+    this.foundContent = this.finder.find(this.type, this.children);
   }
-
-  protected abstract ContentVisitor<ContentType.Root<C>, C> contentVisitor();
 
   @Override
   public final void parse() {
