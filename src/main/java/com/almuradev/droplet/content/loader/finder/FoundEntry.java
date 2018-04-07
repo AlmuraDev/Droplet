@@ -37,4 +37,8 @@ public interface FoundEntry {
   ContentSpec spec();
 
   FeatureContext context();
+
+  boolean valid();
+
+  void invalidate();
 }

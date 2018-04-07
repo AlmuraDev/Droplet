@@ -107,13 +107,19 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
               if(!this.validateSpec(entriesLogger, entry.spec())) {
                 return;
               }
+              final List<Element> childrenElements = rootElement.getChildren(entry.rootType().rootElement());
               final Node rootNode = Node.of(rootElement);
               this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
-              rootElement.getChildren(entry.rootType().rootElement()).forEach(child2 -> {
-                final Node node = Node.of(child2);
-                this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
-                this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
-              });
+              if(!childrenElements.isEmpty()) {
+                childrenElements.forEach(child2 -> {
+                  final Node node = Node.of(child2);
+                  this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
+                  this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+                });
+              } else {
+                entriesLogger.pushing(il -> il.debug("No children with name '" + entry.rootType().rootElement() + "' - invalidating"));
+                entry.invalidate();
+              }
             });
           });
         });
@@ -184,7 +190,7 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
   @Override
   public final void queue() {
     final IndentingLogger logger = new IndentingLogger(this.logger, 1);
-    logger.debug("{}Queuing {} content...", this.type.id());
+    logger.debug("Queuing {} content...", this.type.id());
   }
 
   public final FoundContent<ContentType.Root<C>, C> foundContent() {

@@ -55,7 +55,9 @@ public final class FoundContent<R extends ContentType.Root<C>, C extends Content
   }
 
   public List<FoundContentEntry<R, C>> entries() {
-    return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+    return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream)
+      .filter(FoundEntry::valid)
+      .collect(Collectors.toList());
   }
 
   public Optional<List<FoundEntry>> typeIncludes() {

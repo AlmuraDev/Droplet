@@ -30,6 +30,7 @@ public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C
   private final R rootType;
   private final C childType;
   private Content result;
+  private boolean valid = true;
 
   protected AbstractFoundContentEntry(final R rootType, final C childType) {
     this.rootType = rootType;
@@ -52,6 +53,16 @@ public abstract class AbstractFoundContentEntry<R extends ContentType.Root<C>, C
       this.result = this.builder().build();
     }
     return this.result;
+  }
+
+  @Override
+  public boolean valid() {
+    return this.valid;
+  }
+
+  @Override
+  public void invalidate() {
+    this.valid = false;
   }
 
   @Override

@@ -144,6 +144,15 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
       public Element rootElement() {
         return this.rootElement.get();
       }
+
+      @Override
+      public boolean valid() {
+        return true;
+      }
+
+      @Override
+      public void invalidate() {
+      }
     };
   }
 
