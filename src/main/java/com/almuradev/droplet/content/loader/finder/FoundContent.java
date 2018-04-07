@@ -51,7 +51,7 @@ public final class FoundContent<R extends ContentType.Root<C>, C extends Content
   }
 
   public List<FoundContentEntry<R, C>> entries(final C type) {
-    return this.entries.get(type);
+    return this.entries.get(type).stream().filter(FoundEntry::valid).collect(Collectors.toList());
   }
 
   public List<FoundContentEntry<R, C>> entries() {
