@@ -48,7 +48,7 @@ public final class Nodes {
   }
 
   public static Node firstNonEmpty(final Node node, final String child) {
-    if(!node.value().isEmpty()) {
+    if(!node.value().trim().isEmpty()) {
       return node;
     }
     return node.nodes(child).collect(MoreCollectors.onlyElement());
