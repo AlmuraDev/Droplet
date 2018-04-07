@@ -36,7 +36,7 @@ import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 import com.almuradev.droplet.parser.Nodes;
-import com.almuradev.droplet.util.Logging;
+import com.almuradev.droplet.util.IndentingLogger;
 import com.google.common.collect.MoreCollectors;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.node.Node;
@@ -51,7 +51,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-public abstract class RootContentLoaderImpl<C extends ContentType.Child, B extends ContentBuilder<?>> implements RootContentLoader<C> {
+public class RootContentLoaderImpl<C extends ContentType.Child, B extends ContentBuilder<?>> implements RootContentLoader<C> {
   private final Map<C, ChildContentLoader<C>> childLoaderByChild = new HashMap<>();
   @Inject private Logger logger;
   @Inject private ContentType.Root<C> type;
@@ -69,59 +69,78 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
 
   @Override
   public final void parse() {
-    this.logger.debug("{}Parsing {} content...", Logging.indent(1), this.type.id());
+    final IndentingLogger logger = new IndentingLogger(this.logger, 1);
+    logger.debug("Parsing {} content...", this.type.id());
+    logger.push();
 
+    // Process type-level includes first
     this.foundContent.typeIncludes().ifPresent(typeIncludes -> {
-      this.logger.debug("{}Parsing root includes...", Logging.indent(2));
-      this.processIncludes(Collections.emptyList(), typeIncludes, 2);
+      logger.debug("Parsing includes...");
+      logger.pushing(includeLogger -> this.processIncludes(includeLogger, typeIncludes));
     });
 
-    final long entries = this.children.stream()
+    logger.debug("Parsing children...");
+    logger.push();
+    this.children.stream()
       .map(ChildContentLoader::type)
       .filter(child -> !this.foundContent.entries(child).isEmpty())
-      .mapToLong(child -> {
-        this.logger.debug("{}Parsing {} content...", Logging.indent(2), child.id());
-        final List<FoundEntry> includes = this.foundContent.childIncludes().map(childIncludes -> childIncludes.get(child)).orElse(Collections.emptyList());
-        if(!includes.isEmpty()) {
-          this.logger.debug("{}Parsing includes...", Logging.indent(3));
-          this.processIncludes(this.foundContent.typeIncludes().orElse(Collections.emptyList()), includes, 3);
-        }
-        this.logger.debug("{}Parsing entries...", Logging.indent(3));
-        return this.foundContent.entries(child).stream().peek(entry -> {
-          this.logger.debug("{}Parsing {}", Logging.indent(4), entry.toString());
-          this.featureContext.set(entry.context());
-          this.inheritContext(entry);
-          final Element rootElement = entry.rootElement();
-          if(!entry.spec().atLeast(ContentSpec.CURRENT)) {
-            this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(5), entry.spec(), ContentSpec.CURRENT);
-            return;
+      .forEach(child -> {
+        logger.debug("Parsing {} children...", child.id());
+
+        logger.pushing(childrenLogger -> {
+          final List<FoundEntry> includes = this.foundContent.childIncludes().map(childIncludes -> childIncludes.get(child)).orElse(Collections.emptyList());
+
+          // Followed by children-level includes
+          if(!includes.isEmpty()) {
+            childrenLogger.debug("Parsing includes...");
+            childrenLogger.pushing(includeLogger -> this.processIncludes(includeLogger, includes));
           }
-          final Node rootNode = Node.of(rootElement);
-          this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
-          rootElement.getChildren(entry.rootType().rootElement()).forEach(child2 -> {
-            final Node node = Node.of(child2);
-            this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
-            this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+
+          // and then the actual content
+          childrenLogger.debug("Parsing entries...");
+          childrenLogger.pushing(entriesLogger -> {
+            this.foundContent.entries(child).forEach(entry -> {
+              entriesLogger.debug("Parsing {}", entry.toString());
+              this.featureContext.set(entry.context());
+              this.inheritContext(entry);
+              final Element rootElement = entry.rootElement();
+              if(!this.validateSpec(entriesLogger, entry.spec())) {
+                return;
+              }
+              final Node rootNode = Node.of(rootElement);
+              this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
+              rootElement.getChildren(entry.rootType().rootElement()).forEach(child2 -> {
+                final Node node = Node.of(child2);
+                this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
+                this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+              });
+            });
           });
-        }).count();
-      }).sum();
+        });
+      });
     this.featureContext.set(null);
-    this.logger.debug("{}{} {} parsed", Logging.indent(2), entries, entries == 1 ? "entry" : "entries");
   }
 
-  private void processIncludes(final List<FoundEntry> inherit, final List<FoundEntry> typeIncludes, final int indentStart) {
+  private void processIncludes(final IndentingLogger logger, final List<FoundEntry> typeIncludes) {
     typeIncludes.forEach(entry -> {
-      this.logger.debug("{}Parsing {}", Logging.indent(indentStart + 1), entry.toString());
+      logger.debug("Parsing {}", entry.toString());
       this.featureContext.set(entry.context());
       final Element rootElement = entry.rootElement();
-      if(!entry.spec().atLeast(ContentSpec.CURRENT)) {
-        this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(indentStart + 2), entry.spec(), ContentSpec.CURRENT);
+      if(!this.validateSpec(logger, entry.spec())) {
         return;
       }
       final Node rootNode = Node.of(rootElement);
       this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
     });
     this.featureContext.set(null);
+  }
+
+  private boolean validateSpec(final IndentingLogger parentLogger, final ContentSpec spec) {
+    if(!spec.atLeast(ContentSpec.CURRENT)) {
+      parentLogger.pushing(logger -> logger.error("Specification version {} is below minimum supported version {}", spec, ContentSpec.CURRENT));
+      return false;
+    }
+    return true;
   }
 
   private void inheritContext(final FoundContentEntry<ContentType.Root<C>, C> entry) {
@@ -136,22 +155,27 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
 
   @Override
   public final void validate() {
-    this.logger.debug("{}Validating {} content...", Logging.indent(1), this.type.id());
+    final IndentingLogger logger = new IndentingLogger(this.logger, 1);
+    logger.debug("Validating {} content...", this.type.id());
+    logger.push();
     this.children.stream()
       .map(ChildContentLoader::type)
       .filter(child -> !this.foundContent.entries(child).isEmpty())
       .forEach(child -> {
-        this.logger.debug("{}Validating {} content...", Logging.indent(2), child.id());
-        this.foundContent.entries(child).forEach(entry -> {
-          entry.context().validate().forEach(exception -> {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(entry.absolutePath().toString());
-            /* @Nullable */ final Node node = exception.node();
-            if(node != null) {
-              Nodes.appendLocation(node, sb);
-            }
-            sb.append(": ").append(exception.getMessage());
-            this.logger.error("{}{}", Logging.indent(3), sb.toString());
+        logger.debug("Validating {} content...", child.id());
+        logger.pushing(childLogger -> {
+          this.foundContent.entries(child).forEach(entry -> {
+            entry.context().validate().forEach(exception -> {
+              final StringBuilder sb = new StringBuilder();
+              sb.append(entry.absolutePath().toString());
+              /* @Nullable */
+              final Node node = exception.node();
+              if(node != null) {
+                Nodes.appendLocation(node, sb);
+              }
+              sb.append(": ").append(exception.getMessage());
+              childLogger.error("{}", sb.toString());
+            });
           });
         });
       });
@@ -159,7 +183,8 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
 
   @Override
   public final void queue() {
-    this.logger.debug("{}Queuing {} content...", Logging.indent(1), this.type.id());
+    final IndentingLogger logger = new IndentingLogger(this.logger, 1);
+    logger.debug("{}Queuing {} content...", this.type.id());
   }
 
   public final FoundContent<ContentType.Root<C>, C> foundContent() {
