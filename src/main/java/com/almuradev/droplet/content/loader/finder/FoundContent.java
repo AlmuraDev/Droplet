@@ -27,20 +27,27 @@ import com.almuradev.droplet.content.type.ContentType;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
   private final ListMultimap<C, FoundContentEntry<R, C>> entries;
+  @Nullable private final List<FoundEntry> typeIncludes;
+  @Nullable private final ListMultimap<C, FoundEntry> childIncludes;
 
   public FoundContent() {
-    this(ArrayListMultimap.create());
+    this(ArrayListMultimap.create(), new ArrayList<>(), ArrayListMultimap.create());
   }
 
-  public FoundContent(final ListMultimap<C, FoundContentEntry<R, C>> entries) {
+  public FoundContent(final ListMultimap<C, FoundContentEntry<R, C>> entries, @Nullable final List<FoundEntry> typeIncludes, @Nullable final ListMultimap<C, FoundEntry> childIncludes) {
     this.entries = entries;
+    this.typeIncludes = typeIncludes;
+    this.childIncludes = childIncludes;
   }
 
   public List<FoundContentEntry<R, C>> entries(final C type) {
@@ -49,6 +56,14 @@ public final class FoundContent<R extends ContentType.Root<C>, C extends Content
 
   public List<FoundContentEntry<R, C>> entries() {
     return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+  }
+
+  public Optional<List<FoundEntry>> typeIncludes() {
+    return Optional.ofNullable(this.typeIncludes);
+  }
+
+  public Optional<ListMultimap<C, FoundEntry>> childIncludes() {
+    return Optional.ofNullable(this.childIncludes);
   }
 
   public void offer(final FoundContentEntry<?, C> entry) {

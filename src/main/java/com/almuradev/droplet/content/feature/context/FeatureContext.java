@@ -47,4 +47,6 @@ public interface FeatureContext {
   <F> F add(final Class<F> type, final String id, final F feature);
 
   List<XMLException> validate();
+
+  void addParent(final FeatureContext that);
 }

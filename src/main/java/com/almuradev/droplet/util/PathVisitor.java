@@ -23,9 +23,12 @@
  */
 package com.almuradev.droplet.util;
 
+import net.kyori.lunar.exception.Exceptions;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -33,6 +36,14 @@ import java.nio.file.attribute.BasicFileAttributes;
  * An abstract implementation of a {@link FileVisitor} to allow overriding only what is needed.
  */
 public interface PathVisitor extends FileVisitor<Path> {
+  static void walk(final Path start, final PathVisitor visitor) {
+    try {
+      Files.walkFileTree(start, visitor);
+    } catch(final IOException t) {
+      throw Exceptions.rethrow(t);
+    }
+  }
+
   @Override
   default FileVisitResult preVisitDirectory(final Path directory, final BasicFileAttributes attributes) throws IOException {
     return FileVisitResult.CONTINUE;

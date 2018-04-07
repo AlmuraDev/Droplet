@@ -25,10 +25,12 @@ package com.almuradev.droplet.content.loader;
 
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
-import com.almuradev.droplet.content.inject.ForGlobal;
 import com.almuradev.droplet.content.inject.ForRoot;
 import com.almuradev.droplet.content.loader.finder.ContentFinder;
 import com.almuradev.droplet.content.loader.finder.FoundContent;
+import com.almuradev.droplet.content.loader.finder.FoundContentEntry;
+import com.almuradev.droplet.content.loader.finder.FoundEntry;
+import com.almuradev.droplet.content.processor.GlobalProcessor;
 import com.almuradev.droplet.content.processor.Processor;
 import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.ContentBuilder;
@@ -41,7 +43,9 @@ import net.kyori.xml.node.Node;
 import org.jdom2.Element;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,7 +57,7 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
   @Inject private ContentType.Root<C> type;
   @Inject private ContentFinder finder;
   @Inject private Set<ChildContentLoader<C>> children;
-  @ForGlobal @Inject private Set<Processor<?>> globalProcessors;
+  @Inject private Set<GlobalProcessor> globalProcessors;
   @ForRoot @Inject private Set<Processor<? extends B>> processors;
   @Inject private DynamicProvider<FeatureContext> featureContext;
   private FoundContent<ContentType.Root<C>, C> foundContent;
@@ -67,21 +71,33 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
   public final void parse() {
     this.logger.debug("{}Parsing {} content...", Logging.indent(1), this.type.id());
 
+    this.foundContent.typeIncludes().ifPresent(typeIncludes -> {
+      this.logger.debug("{}Parsing root includes...", Logging.indent(2));
+      this.processIncludes(Collections.emptyList(), typeIncludes, 2);
+    });
+
     final long entries = this.children.stream()
       .map(ChildContentLoader::type)
       .filter(child -> !this.foundContent.entries(child).isEmpty())
       .mapToLong(child -> {
         this.logger.debug("{}Parsing {} content...", Logging.indent(2), child.id());
+        final List<FoundEntry> includes = this.foundContent.childIncludes().map(childIncludes -> childIncludes.get(child)).orElse(Collections.emptyList());
+        if(!includes.isEmpty()) {
+          this.logger.debug("{}Parsing includes...", Logging.indent(3));
+          this.processIncludes(this.foundContent.typeIncludes().orElse(Collections.emptyList()), includes, 3);
+        }
+        this.logger.debug("{}Parsing entries...", Logging.indent(3));
         return this.foundContent.entries(child).stream().peek(entry -> {
-          this.logger.debug("{}Parsing {}", Logging.indent(3), entry.toString());
+          this.logger.debug("{}Parsing {}", Logging.indent(4), entry.toString());
           this.featureContext.set(entry.context());
+          this.inheritContext(entry);
           final Element rootElement = entry.rootElement();
           if(!entry.spec().atLeast(ContentSpec.CURRENT)) {
-            this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(4), entry.spec(), ContentSpec.CURRENT);
+            this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(5), entry.spec(), ContentSpec.CURRENT);
             return;
           }
           final Node rootNode = Node.of(rootElement);
-          this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(rootNode, entry.builder())));
+          this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
           rootElement.getChildren(entry.rootType().rootElement()).forEach(child2 -> {
             final Node node = Node.of(child2);
             this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
@@ -91,6 +107,27 @@ public abstract class RootContentLoaderImpl<C extends ContentType.Child, B exten
       }).sum();
     this.featureContext.set(null);
     this.logger.debug("{}{} {} parsed", Logging.indent(2), entries, entries == 1 ? "entry" : "entries");
+  }
+
+  private void processIncludes(final List<FoundEntry> inherit, final List<FoundEntry> typeIncludes, final int indentStart) {
+    typeIncludes.forEach(entry -> {
+      this.logger.debug("{}Parsing {}", Logging.indent(indentStart + 1), entry.toString());
+      this.featureContext.set(entry.context());
+      final Element rootElement = entry.rootElement();
+      if(!entry.spec().atLeast(ContentSpec.CURRENT)) {
+        this.logger.error("{}Specification version {} is below minimum supported version {}", Logging.indent(indentStart + 2), entry.spec(), ContentSpec.CURRENT);
+        return;
+      }
+      final Node rootNode = Node.of(rootElement);
+      this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
+    });
+    this.featureContext.set(null);
+  }
+
+  private void inheritContext(final FoundContentEntry<ContentType.Root<C>, C> entry) {
+    final FeatureContext context = entry.context();
+    this.foundContent.typeIncludes().ifPresent(typeIncludes -> typeIncludes.forEach(include -> context.addParent(include.context())));
+    this.foundContent.childIncludes().ifPresent(childIncludes -> childIncludes.get(entry.childType()).forEach(include -> context.addParent(include.context())));
   }
 
   private ChildContentLoader<C> childLoader(final C child) {

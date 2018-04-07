@@ -21,14 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.content.inject;
+package com.almuradev.droplet.content.loader.finder;
 
-import com.google.inject.BindingAnnotation;
+import com.almuradev.droplet.content.feature.context.FeatureContext;
+import com.almuradev.droplet.content.feature.context.FeatureContextImpl;
+import com.almuradev.droplet.content.spec.ContentSpec;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import static java.util.Objects.requireNonNull;
 
-@BindingAnnotation
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ForGlobal {
+public abstract class AbstractFoundEntry implements FoundEntry {
+  private final FeatureContext context = new FeatureContextImpl();
+  @Nullable private ContentSpec spec;
+
+  @Override
+  public ContentSpec spec() {
+    if(this.spec == null) {
+      this.spec = ContentSpec.parse(requireNonNull(this.rootElement().getAttribute("spec"), "missing spec attribute").getValue());
+    }
+    return this.spec;
+  }
+
+  @Override
+  public FeatureContext context() {
+    return this.context;
+  }
+
+  @Override
+  public String toString() {
+    return this.absolutePath().toString();
+  }
 }

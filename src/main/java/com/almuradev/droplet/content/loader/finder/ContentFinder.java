@@ -26,8 +26,13 @@ package com.almuradev.droplet.content.loader.finder;
 import com.almuradev.droplet.content.loader.ChildContentLoader;
 import com.almuradev.droplet.content.type.ContentType;
 
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.Set;
 
 public interface ContentFinder {
+  String INCLUDE_DIRECTORY_NAME = "include";
+  PathMatcher XML_MATCHER = FileSystems.getDefault().getPathMatcher("glob:**.xml");
+
   <C extends ContentType.Child, R extends ContentType.Root<C>> FoundContent<R, C> find(final R rootType, final Set<ChildContentLoader<C>> childrenTypes);
 }

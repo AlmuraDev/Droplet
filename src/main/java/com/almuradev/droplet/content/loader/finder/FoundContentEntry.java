@@ -23,18 +23,14 @@
  */
 package com.almuradev.droplet.content.loader.finder;
 
-import com.almuradev.droplet.content.feature.context.FeatureContext;
-import com.almuradev.droplet.content.spec.ContentSpec;
 import com.almuradev.droplet.content.type.Content;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 import com.almuradev.droplet.registry.RegistryKey;
-import org.jdom2.Element;
 
-import java.nio.file.Path;
 import java.util.function.Consumer;
 
-public interface FoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> {
+public interface FoundContentEntry<R extends ContentType.Root<C>, C extends ContentType.Child> extends FoundEntry {
   String namespace();
 
   RegistryKey key();
@@ -42,14 +38,6 @@ public interface FoundContentEntry<R extends ContentType.Root<C>, C extends Cont
   R rootType();
 
   C childType();
-
-  Path absolutePath();
-
-  Element rootElement();
-
-  ContentSpec spec();
-
-  FeatureContext context();
 
   ContentBuilder builder();
 

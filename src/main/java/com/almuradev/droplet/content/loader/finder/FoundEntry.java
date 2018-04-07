@@ -21,33 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component.filter;
+package com.almuradev.droplet.content.loader.finder;
 
-import com.almuradev.droplet.content.processor.GlobalProcessor;
-import net.kyori.xml.node.Node;
+import com.almuradev.droplet.content.feature.context.FeatureContext;
+import com.almuradev.droplet.content.spec.ContentSpec;
+import org.jdom2.Element;
 
-import java.util.Comparator;
+import java.nio.file.Path;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+public interface FoundEntry {
+  Path absolutePath();
 
-@Singleton
-public final class RootFilterProcessor implements GlobalProcessor {
-  private final FilterParser filterParser;
+  Element rootElement();
 
-  @Inject
-  private RootFilterProcessor(final FilterParser filterParser) {
-    this.filterParser = filterParser;
-  }
+  ContentSpec spec();
 
-  @Override
-  public void process(final Node node) {
-    node.nodes("filters").forEach(this::processChildren);
-  }
-
-  protected void processChildren(final Node node) {
-    node.elements()
-      .sorted(Comparator.comparing(Node::name))
-      .forEach(this.filterParser::parse);
-  }
+  FeatureContext context();
 }

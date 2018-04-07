@@ -23,13 +23,11 @@
  */
 package com.almuradev.droplet.content.inject;
 
-import com.almuradev.droplet.content.processor.Processor;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import com.almuradev.droplet.content.processor.GlobalProcessor;
 import net.kyori.violet.VBinder;
 
 public interface GlobalBinder extends VBinder {
-  default <P extends Processor<?>> void bindGlobalProcessor(final Class<P> processorClass) {
-    this.inSet(Key.get(new TypeLiteral<Processor<?>>() {}, ForGlobal.class)).addBinding().to(processorClass);
+  default <P extends GlobalProcessor> void bindGlobalProcessor(final Class<P> processorClass) {
+    this.inSet(GlobalProcessor.class).addBinding().to(processorClass);
   }
 }

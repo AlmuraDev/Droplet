@@ -21,33 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component.filter;
+package com.almuradev.droplet.content.processor;
 
-import com.almuradev.droplet.content.processor.GlobalProcessor;
+import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 
-import java.util.Comparator;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-@Singleton
-public final class RootFilterProcessor implements GlobalProcessor {
-  private final FilterParser filterParser;
-
-  @Inject
-  private RootFilterProcessor(final FilterParser filterParser) {
-    this.filterParser = filterParser;
-  }
-
-  @Override
-  public void process(final Node node) {
-    node.nodes("filters").forEach(this::processChildren);
-  }
-
-  protected void processChildren(final Node node) {
-    node.elements()
-      .sorted(Comparator.comparing(Node::name))
-      .forEach(this.filterParser::parse);
-  }
+public interface GlobalProcessor {
+  void process(final Node node) throws XMLException;
 }

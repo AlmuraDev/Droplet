@@ -27,6 +27,8 @@ import com.almuradev.droplet.content.feature.Feature;
 import com.almuradev.droplet.content.feature.ProxiedFeature;
 import com.almuradev.droplet.proxy.MethodHandleInvocationHandler;
 import com.almuradev.droplet.proxy.Proxied;
+import com.google.common.collect.MoreCollectors;
+import net.kyori.lunar.Optionals;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -37,9 +39,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class FeatureContextImpl implements FeatureContext {
   private final Map<String, Entry<?>> entriesById = new HashMap<>();
+  private final List<FeatureContextImpl> parents = new ArrayList<>();
 
   @Override
   public <F> F get(final Class<F> type, final Node node) throws XMLException {
@@ -78,7 +82,10 @@ public class FeatureContextImpl implements FeatureContext {
   }
 
   private <F> Entry<F> feature(final Class<F> type, final String id) {
-    return (Entry<F>) this.entriesById.computeIfAbsent(id, key -> new Entry<>(type, id));
+    return (Entry<F>) Optionals.first(
+      Optional.ofNullable(this.entriesById.get(id)),
+      this.parents.stream().map(parent -> parent.entriesById.get(id)).collect(MoreCollectors.toOptional())
+    ).orElseGet(() -> this.entriesById.computeIfAbsent(id, key -> new Entry<>(type, id)));
   }
 
   @Override
@@ -90,6 +97,11 @@ public class FeatureContextImpl implements FeatureContext {
       }
     }
     return exceptions;
+  }
+
+  @Override
+  public void addParent(final FeatureContext that) {
+    this.parents.add((FeatureContextImpl) that);
   }
 
   @Override
