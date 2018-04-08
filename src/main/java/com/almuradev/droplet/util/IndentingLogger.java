@@ -26,12 +26,11 @@ package com.almuradev.droplet.util;
 import org.slf4j.Logger;
 
 import java.util.Stack;
-import java.util.function.Consumer;
 
-public class IndentingLogger {
+public class IndentingLogger implements AutoCloseable {
   private final Logger logger;
   private final Stack<Entry> stashes = new Stack<>();
-  private Entry current = new Entry(0);
+  private Entry current;
 
   public IndentingLogger(final Logger logger) {
     this(logger, 0);
@@ -39,28 +38,31 @@ public class IndentingLogger {
 
   public IndentingLogger(final Logger logger, final int startLevel) {
     this.logger = logger;
-    this.current.level = startLevel;
+    this.current = new Entry(startLevel);
   }
 
-  public void push() {
+  public IndentingLogger push() {
     this.stashes.add(this.current);
     this.current = new Entry(this.current.level + 1);
+    return this;
   }
 
-  public void pop() {
-    if(this.stashes.isEmpty()) {
-      return;
-    }
-    this.current = this.stashes.pop();
-  }
-
-  public void pushing(final Consumer<IndentingLogger> consumer) {
+  public void push(final Runnable runnable) {
     this.push();
     try {
-      consumer.accept(this);
+      runnable.run();
     } finally {
       this.pop();
     }
+  }
+
+  @Override
+  public void close() {
+    this.pop();
+  }
+
+  private void pop() {
+    this.current = this.stashes.pop();
   }
 
   public void debug(final String message) {
@@ -84,7 +86,7 @@ public class IndentingLogger {
   }
 
   private class Entry {
-    int level;
+    final int level;
 
     public Entry(int level) {
       this.level = level;

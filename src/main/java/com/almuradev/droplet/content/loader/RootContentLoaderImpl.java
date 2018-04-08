@@ -76,7 +76,7 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
     // Process type-level includes first
     this.foundContent.typeIncludes().ifPresent(typeIncludes -> {
       logger.debug("Parsing includes...");
-      logger.pushing(includeLogger -> this.processIncludes(includeLogger, typeIncludes));
+      logger.push(() -> this.processIncludes(logger, typeIncludes));
     });
 
     logger.debug("Parsing children...");
@@ -87,24 +87,24 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
       .forEach(child -> {
         logger.debug("Parsing {} children...", child.id());
 
-        logger.pushing(childrenLogger -> {
+        try(final IndentingLogger $ = logger.push()) {
           final List<FoundEntry> includes = this.foundContent.childIncludes().map(childIncludes -> childIncludes.get(child)).orElse(Collections.emptyList());
 
           // Followed by children-level includes
           if(!includes.isEmpty()) {
-            childrenLogger.debug("Parsing includes...");
-            childrenLogger.pushing(includeLogger -> this.processIncludes(includeLogger, includes));
+            logger.debug("Parsing includes...");
+            logger.push(() -> this.processIncludes(logger, includes));
           }
 
           // and then the actual content
-          childrenLogger.debug("Parsing entries...");
-          childrenLogger.pushing(entriesLogger -> {
+          logger.debug("Parsing entries...");
+          try(final IndentingLogger $$ = logger.push()) {
             this.foundContent.entries(child).forEach(entry -> {
-              entriesLogger.debug("Parsing {}", entry.toString());
+              logger.debug("Parsing {}", entry.toString());
               this.featureContext.set(entry.context());
               this.inheritContext(entry);
               final Element rootElement = entry.rootElement();
-              if(!this.validateSpec(entriesLogger, entry.spec())) {
+              if(!this.validateSpec(logger, entry.spec())) {
                 return;
               }
               final List<Element> childrenElements = rootElement.getChildren(entry.rootType().rootElement());
@@ -117,12 +117,12 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
                   this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
                 });
               } else {
-                entriesLogger.pushing(il -> il.debug("No children with name '" + entry.rootType().rootElement() + "' - invalidating"));
+                logger.push(() -> logger.debug("No children with name '" + entry.rootType().rootElement() + "' - invalidating"));
                 entry.invalidate();
               }
             });
-          });
-        });
+          }
+        }
       });
     this.featureContext.set(null);
   }
@@ -141,9 +141,9 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
     this.featureContext.set(null);
   }
 
-  private boolean validateSpec(final IndentingLogger parentLogger, final ContentSpec spec) {
+  private boolean validateSpec(final IndentingLogger logger, final ContentSpec spec) {
     if(!spec.atLeast(ContentSpec.CURRENT)) {
-      parentLogger.pushing(logger -> logger.error("Specification version {} is below minimum supported version {}", spec, ContentSpec.CURRENT));
+      logger.push(() -> logger.error("Specification version {} is below minimum supported version {}", spec, ContentSpec.CURRENT));
       return false;
     }
     return true;
@@ -169,21 +169,20 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
       .filter(child -> !this.foundContent.entries(child).isEmpty())
       .forEach(child -> {
         logger.debug("Validating {} content...", child.id());
-        logger.pushing(childLogger -> {
+        try(final IndentingLogger $ = logger.push()) {
           this.foundContent.entries(child).forEach(entry -> {
             entry.context().validate().forEach(exception -> {
               final StringBuilder sb = new StringBuilder();
               sb.append(entry.absolutePath().toString());
-              /* @Nullable */
-              final Node node = exception.node();
+              /* @Nullable */ final Node node = exception.node();
               if(node != null) {
                 Nodes.appendLocation(node, sb);
               }
               sb.append(": ").append(exception.getMessage());
-              childLogger.error("{}", sb.toString());
+              logger.error("{}", sb.toString());
             });
           });
-        });
+        }
       });
   }
 
