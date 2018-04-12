@@ -25,13 +25,18 @@ package com.almuradev.droplet.component.filter;
 
 import java.util.function.Consumer;
 
-public final class FilterLinked<V> {
+public final class FilterLinked<V> implements Filtered {
   private final Filter filter;
   private final V value;
 
   public FilterLinked(final Filter filter, final V value) {
     this.filter = filter;
     this.value = value;
+  }
+
+  @Override
+  public Filter filter() {
+    return this.filter;
   }
 
   public FilterResponse query(final FilterQuery query) {
