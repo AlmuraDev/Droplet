@@ -23,6 +23,7 @@
  */
 package com.almuradev.droplet.registry.reference;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
@@ -31,8 +32,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @param <T> the value type
  */
 public interface RegistryReference<T> {
-  @Nullable
-  T get();
+  @Nullable T get();
 
-  T require();
+  @NonNull T require();
 }

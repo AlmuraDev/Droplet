@@ -23,8 +23,10 @@
  */
 package com.almuradev.droplet.registry;
 
-public interface RegistryKey {
-  String namespace();
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-  String value();
+public interface RegistryKey {
+  @NonNull String namespace();
+
+  @NonNull String value();
 }

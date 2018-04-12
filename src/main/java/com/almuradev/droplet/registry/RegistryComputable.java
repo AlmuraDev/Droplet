@@ -23,13 +23,15 @@
  */
 package com.almuradev.droplet.registry;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public interface RegistryComputable<T> {
   /**
    * Gets the registry key.
    *
    * @return the registry key
    */
-  RegistryKey registryKey();
+  @NonNull RegistryKey registryKey();
 
   /**
    * Tests if the registry can compute this.
@@ -43,5 +45,5 @@ public interface RegistryComputable<T> {
    *
    * @return the computed value
    */
-  T registryCompute();
+  @NonNull T registryCompute();
 }

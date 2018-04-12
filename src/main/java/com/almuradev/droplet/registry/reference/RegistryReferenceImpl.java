@@ -26,6 +26,7 @@ package com.almuradev.droplet.registry.reference;
 import com.almuradev.droplet.registry.Registry;
 import com.almuradev.droplet.registry.RegistryKey;
 import com.google.common.base.MoreObjects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class RegistryReferenceImpl<V> extends LazyRegistryReference<V> {
   private final Registry<V> registry;
@@ -37,7 +38,7 @@ public final class RegistryReferenceImpl<V> extends LazyRegistryReference<V> {
   }
 
   @Override
-  protected V load() {
+  protected @Nullable V load() {
     return this.registry.get(this.key);
   }
 

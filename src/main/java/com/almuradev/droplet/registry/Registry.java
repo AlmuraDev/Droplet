@@ -26,6 +26,7 @@ package com.almuradev.droplet.registry;
 import com.almuradev.droplet.registry.reference.ComputableRegistryReference;
 import com.almuradev.droplet.registry.reference.RegistryReference;
 import com.almuradev.droplet.registry.reference.RegistryReferenceImpl;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Optional;
@@ -42,8 +43,7 @@ public interface Registry<V> {
    * @param key the key
    * @return the value
    */
-  @Nullable
-  V get(final RegistryKey key);
+  @Nullable V get(final @NonNull RegistryKey key);
 
   /**
    * Puts a value in this registry.
@@ -51,7 +51,7 @@ public interface Registry<V> {
    * @param key the key
    * @param value the value
    */
-  void put(final RegistryKey key, final V value);
+  void put(final @NonNull RegistryKey key, final @NonNull V value);
 
   /**
    * Finds a value in this registry.
@@ -59,7 +59,7 @@ public interface Registry<V> {
    * @param key the key
    * @return the value
    */
-  default Optional<V> find(final RegistryKey key) {
+  default @NonNull Optional<V> find(final @NonNull RegistryKey key) {
     return Optional.ofNullable(this.get(key));
   }
 
@@ -69,7 +69,7 @@ public interface Registry<V> {
    * @param key the key
    * @return the value reference
    */
-  default RegistryReference<V> ref(final RegistryKey key) {
+  default @NonNull RegistryReference<V> ref(final @NonNull RegistryKey key) {
     return new RegistryReferenceImpl<>(this, key);
   }
 
@@ -79,7 +79,7 @@ public interface Registry<V> {
    * @param computable the computable
    * @return the value reference
    */
-  default RegistryReference<V> ref(final RegistryComputable<V> computable) {
+  default @NonNull RegistryReference<V> ref(final @NonNull RegistryComputable<V> computable) {
     return new ComputableRegistryReference<>(this, computable);
   }
 }

@@ -24,6 +24,7 @@
 package com.almuradev.droplet.registry;
 
 import com.google.common.base.MoreObjects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
@@ -37,14 +38,13 @@ import java.util.Map;
 public class RegistryImpl<T> implements Registry<T> {
   private final Map<RegistryKey, T> map = new HashMap<>();
 
-  @Nullable
   @Override
-  public T get(final RegistryKey key) {
+  public @Nullable T get(final @NonNull RegistryKey key) {
     return this.map.get(key);
   }
 
   @Override
-  public void put(final RegistryKey key, final T value) {
+  public void put(final @NonNull RegistryKey key, final @NonNull T value) {
     this.map.put(key, value);
   }
 

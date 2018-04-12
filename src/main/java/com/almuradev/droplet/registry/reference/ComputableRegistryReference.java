@@ -38,8 +38,8 @@ public final class ComputableRegistryReference<V> extends LazyRegistryReference<
   }
 
   @Override
-  protected V load() {
-    @Nullable V value = this.registry.get(this.computable.registryKey());
+  protected @Nullable V load() {
+    /* @Nullable */ V value = this.registry.get(this.computable.registryKey());
     if(value == null && this.computable.registryCanCompute()) {
       value = this.computable.registryCompute();
       this.registry.put(this.computable.registryKey(), value);

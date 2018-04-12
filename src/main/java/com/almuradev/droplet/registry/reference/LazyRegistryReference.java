@@ -23,13 +23,16 @@
  */
 package com.almuradev.droplet.registry.reference;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Objects;
 
 public abstract class LazyRegistryReference<V> implements RegistryReference<V> {
   private V value;
 
   @Override
-  public V get() {
+  public @Nullable V get() {
     if(this.value == null) {
       this.value = this.load();
     }
@@ -37,9 +40,9 @@ public abstract class LazyRegistryReference<V> implements RegistryReference<V> {
   }
 
   @Override
-  public V require() {
+  public @NonNull V require() {
     return Objects.requireNonNull(this.get(), this.toString());
   }
 
-  protected abstract V load();
+  protected abstract @Nullable V load();
 }
