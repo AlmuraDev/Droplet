@@ -23,7 +23,6 @@
  */
 package com.almuradev.droplet.inject;
 
-import com.google.inject.Binder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import net.kyori.membrane.facet.Facet;
 import net.kyori.membrane.facet.FacetBinder;
@@ -32,7 +31,6 @@ import net.kyori.violet.ForwardingDuplexBinder;
 
 public interface DropletBinder extends ForwardingBinder {
   default LinkedBindingBuilder<Facet> bindFacet() {
-    final Binder binder = this instanceof ForwardingDuplexBinder ? ((ForwardingDuplexBinder) this).publicBinder() : this.binder();
-    return FacetBinder.create(binder).add();
+    return FacetBinder.create(this instanceof ForwardingDuplexBinder ? ((ForwardingDuplexBinder) this).publicBinder() : this.binder()).add();
   }
 }

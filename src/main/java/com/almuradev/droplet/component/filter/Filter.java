@@ -25,10 +25,6 @@ package com.almuradev.droplet.component.filter;
 
 import com.almuradev.droplet.content.feature.Feature;
 
-/**
- * You'll more than likely want to implement {@link AbstractFilter} instead - this interface exists to
- * avoid warnings regarding generics.
- */
 public interface Filter extends Feature {
   FilterResponse query(final FilterQuery query);
 
