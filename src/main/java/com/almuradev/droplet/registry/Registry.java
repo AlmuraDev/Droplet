@@ -29,6 +29,7 @@ import com.almuradev.droplet.registry.reference.RegistryReferenceImpl;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -37,6 +38,13 @@ import java.util.Optional;
  * @param <V> the type stored in this registry
  */
 public interface Registry<V> {
+  /**
+   * Gets a collection of all values.
+   *
+   * @return a collection of all values
+   */
+  @NonNull Collection<V> all();
+
   /**
    * Gets a value from this registry.
    *

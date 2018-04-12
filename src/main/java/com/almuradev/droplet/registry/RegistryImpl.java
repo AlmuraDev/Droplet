@@ -27,6 +27,7 @@ import com.google.common.base.MoreObjects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +38,11 @@ import java.util.Map;
  */
 public class RegistryImpl<T> implements Registry<T> {
   private final Map<RegistryKey, T> map = new HashMap<>();
+
+  @Override
+  public @NonNull Collection<T> all() {
+    return this.map.values();
+  }
 
   @Override
   public @Nullable T get(final @NonNull RegistryKey key) {
