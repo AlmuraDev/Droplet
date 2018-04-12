@@ -38,6 +38,7 @@ import com.almuradev.droplet.content.type.ContentType;
 import com.almuradev.droplet.parser.Nodes;
 import com.almuradev.droplet.util.IndentingLogger;
 import com.google.common.collect.MoreCollectors;
+import net.kyori.lunar.CheckedAutoCloseable;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.node.Node;
 import org.jdom2.Element;
@@ -101,44 +102,44 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
           try(final IndentingLogger $$ = logger.push()) {
             this.foundContent.entries(child).forEach(entry -> {
               logger.debug("Parsing {}", entry.toString());
-              this.featureContext.set(entry.context());
-              this.inheritContext(entry);
-              final Element rootElement = entry.rootElement();
-              if(!this.validateSpec(logger, entry.spec())) {
-                return;
-              }
-              final List<Element> childrenElements = rootElement.getChildren(entry.rootType().rootElement());
-              final Node rootNode = Node.of(rootElement);
-              this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
-              if(!childrenElements.isEmpty()) {
-                childrenElements.forEach(child2 -> {
-                  final Node node = Node.of(child2);
-                  this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
-                  this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
-                });
-              } else {
-                logger.push(() -> logger.debug("No children with name '" + entry.rootType().rootElement() + "' - invalidating"));
-                entry.invalidate();
+              try(final CheckedAutoCloseable cac = this.featureContext.set(entry.context())) {
+                this.inheritContext(entry);
+                final Element rootElement = entry.rootElement();
+                if(!this.validateSpec(logger, entry.spec())) {
+                  return;
+                }
+                final List<Element> childrenElements = rootElement.getChildren(entry.rootType().rootElement());
+                final Node rootNode = Node.of(rootElement);
+                this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
+                if(!childrenElements.isEmpty()) {
+                  childrenElements.forEach(child2 -> {
+                    final Node node = Node.of(child2);
+                    this.processors.forEach(Exceptions.rethrowConsumer(processor -> ((Processor) processor).process(node, entry.builder())));
+                    this.childLoader(entry.childType()).processors().forEach(Exceptions.rethrowConsumer(processor -> processor.process(node, entry.builder())));
+                  });
+                } else {
+                  logger.push(() -> logger.debug("No children with name '" + entry.rootType().rootElement() + "' - invalidating"));
+                  entry.invalidate();
+                }
               }
             });
           }
         }
       });
-    this.featureContext.set(null);
   }
 
   private void processIncludes(final IndentingLogger logger, final List<FoundEntry> typeIncludes) {
     typeIncludes.forEach(entry -> {
       logger.debug("Parsing {}", entry.toString());
-      this.featureContext.set(entry.context());
-      final Element rootElement = entry.rootElement();
-      if(!this.validateSpec(logger, entry.spec())) {
-        return;
+      try(final CheckedAutoCloseable $ = this.featureContext.set(entry.context())) {
+        final Element rootElement = entry.rootElement();
+        if(!this.validateSpec(logger, entry.spec())) {
+          return;
+        }
+        final Node rootNode = Node.of(rootElement);
+        this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
       }
-      final Node rootNode = Node.of(rootElement);
-      this.globalProcessors.forEach(Exceptions.rethrowConsumer(processor -> processor.process(rootNode)));
     });
-    this.featureContext.set(null);
   }
 
   private boolean validateSpec(final IndentingLogger logger, final ContentSpec spec) {

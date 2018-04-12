@@ -23,6 +23,8 @@
  */
 package com.almuradev.droplet.content.inject;
 
+import net.kyori.lunar.CheckedAutoCloseable;
+
 import javax.inject.Provider;
 
 public class DynamicProvider<T> implements Provider<T> {
@@ -33,7 +35,9 @@ public class DynamicProvider<T> implements Provider<T> {
     return this.value;
   }
 
-  public void set(final T value) {
-    this.value = value;
+  public CheckedAutoCloseable set(final T newValue) {
+    final T oldValue = this.value;
+    this.value = newValue;
+    return () -> this.value = oldValue;
   }
 }
