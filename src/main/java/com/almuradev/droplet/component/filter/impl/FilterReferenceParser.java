@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 
 @Singleton
 public final class FilterReferenceParser implements FilterTypeParser<Filter> {
+  public static final String ID = "filter";
   private final DynamicProvider<FeatureContext> featureContext;
 
   @Inject

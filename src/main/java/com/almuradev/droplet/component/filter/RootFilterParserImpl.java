@@ -23,6 +23,7 @@
  */
 package com.almuradev.droplet.component.filter;
 
+import com.almuradev.droplet.component.filter.impl.FilterReferenceParser;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.parser.ParserException;
@@ -37,18 +38,28 @@ import javax.inject.Singleton;
 @Singleton
 public final class RootFilterParserImpl implements FilterParser {
   private final Map<String, FilterTypeParser<?>> parsers;
+  private final FilterReferenceParser refParser;
   @Inject private DynamicProvider<FeatureContext> featureContext;
 
   @Inject
-  private RootFilterParserImpl(final Map<String, FilterTypeParser<?>> parsers) {
+  private RootFilterParserImpl(final Map<String, FilterTypeParser<?>> parsers, final FilterReferenceParser refParser) {
     this.parsers = parsers;
+    this.refParser = refParser;
   }
 
   @Override
   public Filter throwingParse(final Node node) throws XMLException {
-    final FilterTypeParser<?> parser = this.parsers.get(node.name());
+    /* @Nullable */ FilterTypeParser<?> parser = this.parsers.get(node.name());
     if(parser == null) {
-      throw new ParserException("Could not find filter parser with name '" + node.name() + '\'');
+      if(node.attribute(FilterReferenceParser.ID).isPresent()) {
+        if(node.elements().findFirst().isPresent()) {
+          throw new ParserException("Could not parse element with name '" + node.name() + "' as a reference as it has children");
+        } else {
+          parser = this.refParser;
+        }
+      } else {
+        throw new ParserException("Could not find filter parser with name '" + node.name() + '\'');
+      }
     }
     return this.featureContext.get().add(Filter.class, node, parser.parse(node));
   }
