@@ -24,11 +24,15 @@
 package com.almuradev.droplet.component.filter;
 
 import com.almuradev.droplet.component.filter.impl.FilterReferenceParser;
+import com.almuradev.droplet.content.feature.Feature;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.parser.ParserException;
+import net.kyori.lunar.EvenMoreObjects;
+import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
+import org.jdom2.Element;
 
 import java.util.Map;
 
@@ -50,17 +54,18 @@ public final class RootFilterParserImpl implements FilterParser {
   @Override
   public Filter throwingParse(final Node node) throws XMLException {
     /* @Nullable */ FilterTypeParser<?> parser = this.parsers.get(node.name());
-    if(parser == null) {
-      if(node.attribute(FilterReferenceParser.ID).isPresent()) {
-        if(node.elements().findFirst().isPresent()) {
-          throw new ParserException("Could not parse element with name '" + node.name() + "' as a reference as it has children");
-        } else {
-          parser = this.refParser;
-        }
+    if(parser != null) {
+      return this.featureContext.get().add(Filter.class, node, parser.parse(node));
+    } else if(node.attribute(FilterReferenceParser.ID).isPresent()) {
+      if(node.elements().findFirst().isPresent()) {
+        throw new ParserException("Could not parse element with name '" + node.name() + "' as a reference as it has children");
       } else {
-        throw new ParserException("Could not find filter parser with name '" + node.name() + '\'');
+        return this.refParser.throwingParse(Node.of(EvenMoreObjects.make(new Element("hack"), Exceptions.rethrowConsumer(element -> {
+          element.setAttribute(Feature.ID_ATTRIBUTE_NAME, node.requireAttribute(FilterReferenceParser.ID).value());
+        }))));
       }
+    } else {
+      throw new ParserException("Could not find filter parser with name '" + node.name() + '\'');
     }
-    return this.featureContext.get().add(Filter.class, node, parser.parse(node));
   }
 }
