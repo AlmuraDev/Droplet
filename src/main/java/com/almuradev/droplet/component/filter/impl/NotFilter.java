@@ -44,6 +44,11 @@ public final class NotFilter extends AbstractSingleFilter {
     return this.filter.query(query).inverse();
   }
 
+  @Override
+  public String toString() {
+    return "NotFilter{" + this.filter + '}';
+  }
+
   @Singleton
   public static final class Parser implements FilterTypeParser<NotFilter> {
     private final FilterParser parser;

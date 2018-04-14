@@ -46,6 +46,11 @@ public final class AllFilter extends AbstractMultipleFilter {
     return this.query(query, FilterResponse.DENY, FilterResponse.ALLOW);
   }
 
+  @Override
+  public String toString() {
+    return "AllFilter{" + this.filters + '}';
+  }
+
   @Singleton
   public static final class Parser implements FilterTypeParser<AllFilter> {
     @Inject private FilterParser parser;
