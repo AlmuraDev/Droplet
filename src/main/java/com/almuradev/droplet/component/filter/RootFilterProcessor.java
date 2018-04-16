@@ -26,8 +26,6 @@ package com.almuradev.droplet.component.filter;
 import com.almuradev.droplet.content.processor.GlobalProcessor;
 import net.kyori.xml.node.Node;
 
-import java.util.Comparator;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -47,7 +45,6 @@ public final class RootFilterProcessor implements GlobalProcessor {
 
   protected void processChildren(final Node node) {
     node.elements()
-      .sorted(Comparator.comparing(Node::name))
       .forEach(this.filterParser::parse);
   }
 }

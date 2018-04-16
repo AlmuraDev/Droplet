@@ -26,6 +26,7 @@ package com.almuradev.droplet.parser;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
+import net.kyori.xml.node.stream.NodeStream;
 
 import java.util.stream.Stream;
 
@@ -53,6 +54,17 @@ public interface Parser<T> {
    * @throws XMLException if an exception occurred while parsing
    */
   T throwingParse(final Node node) throws XMLException;
+
+  /**
+   * Parses a stream of {@link Node} into a stream of {@code T}.
+   *
+   * @param stream the node stream
+   * @return the parsed value
+   */
+  @SuppressWarnings("RedundantThrows")
+  default Stream<T> parse(final NodeStream stream) {
+    return this.parse(stream.stream());
+  }
 
   /**
    * Parses a stream of {@link Node} into a stream of {@code T}.
