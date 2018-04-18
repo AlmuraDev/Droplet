@@ -25,6 +25,7 @@ package com.almuradev.droplet.content.loader;
 
 import com.almuradev.droplet.content.inject.ForChild;
 import com.almuradev.droplet.content.loader.finder.FoundContent;
+import com.almuradev.droplet.content.loader.finder.FoundContentImpl;
 import com.almuradev.droplet.content.processor.Processor;
 import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
@@ -38,7 +39,7 @@ public class ChildContentLoaderImpl<C extends ContentType.Child> implements Chil
   @Inject private C type;
   @Inject private Provider<ContentBuilder> builder;
   @ForChild @Inject private Set<Processor> processors;
-  private final FoundContent<?, C> foundContent = new FoundContent<>();
+  private final FoundContentImpl<?, C> foundContent = new FoundContentImpl<>();
 
   @Override
   public C type() {

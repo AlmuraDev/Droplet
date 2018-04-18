@@ -24,51 +24,23 @@
 package com.almuradev.droplet.content.loader.finder;
 
 import com.almuradev.droplet.content.type.ContentType;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimaps;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public final class FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
-  private final ListMultimap<C, FoundContentEntry<R, C>> entries;
-  @Nullable private final List<FoundEntry> typeIncludes;
-  @Nullable private final ListMultimap<C, FoundEntry> childIncludes;
+public interface FoundContent<R extends ContentType.Root<C>, C extends ContentType.Child> {
+  List<FoundContentEntry<R, C>> entries(final C type);
 
-  public FoundContent() {
-    this(ArrayListMultimap.create(), new ArrayList<>(), ArrayListMultimap.create());
-  }
+  List<FoundContentEntry<R, C>> entries();
 
-  public FoundContent(final ListMultimap<C, FoundContentEntry<R, C>> entries, @Nullable final List<FoundEntry> typeIncludes, @Nullable final ListMultimap<C, FoundEntry> childIncludes) {
-    this.entries = entries;
-    this.typeIncludes = typeIncludes;
-    this.childIncludes = childIncludes;
-  }
+  void pushEntry(final FoundContentEntry<R, C> entry);
 
-  public List<FoundContentEntry<R, C>> entries(final C type) {
-    return this.entries.get(type).stream().filter(FoundEntry::valid).collect(Collectors.toList());
-  }
+  Optional<List<FoundEntry>> typeIncludes();
 
-  public List<FoundContentEntry<R, C>> entries() {
-    return Multimaps.asMap(this.entries).values().stream().flatMap(Collection::stream)
-      .filter(FoundEntry::valid)
-      .collect(Collectors.toList());
-  }
+  void pushTypeInclude(final FoundEntry entry);
 
-  public Optional<List<FoundEntry>> typeIncludes() {
-    return Optional.ofNullable(this.typeIncludes);
-  }
+  Optional<ListMultimap<C, FoundEntry>> childIncludes();
 
-  public Optional<ListMultimap<C, FoundEntry>> childIncludes() {
-    return Optional.ofNullable(this.childIncludes);
-  }
-
-  public void offer(final FoundContentEntry<?, C> entry) {
-    this.entries.put(entry.childType(), (FoundContentEntry<R, C>) entry);
-  }
+  void pushChildInclude(final C type, final FoundEntry entry);
 }

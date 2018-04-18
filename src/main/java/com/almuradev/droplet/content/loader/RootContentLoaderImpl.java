@@ -29,6 +29,7 @@ import com.almuradev.droplet.content.inject.ForRoot;
 import com.almuradev.droplet.content.loader.finder.ContentFinder;
 import com.almuradev.droplet.content.loader.finder.FoundContent;
 import com.almuradev.droplet.content.loader.finder.FoundContentEntry;
+import com.almuradev.droplet.content.loader.finder.FoundContentImpl;
 import com.almuradev.droplet.content.loader.finder.FoundEntry;
 import com.almuradev.droplet.content.processor.GlobalProcessor;
 import com.almuradev.droplet.content.processor.Processor;
@@ -61,11 +62,11 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
   @Inject private Set<GlobalProcessor> globalProcessors;
   @ForRoot @Inject private Set<Processor<? extends B>> processors;
   @Inject private DynamicProvider<FeatureContext> featureContext;
-  private FoundContent<ContentType.Root<C>, C> foundContent;
+  private final FoundContentImpl<ContentType.Root<C>, C> foundContent = new FoundContentImpl<>();
 
   @Override
   public final void discover() {
-    this.foundContent = this.finder.find(this.type, this.children);
+    this.finder.find(this.foundContent, this.type, this.children);
   }
 
   @Override

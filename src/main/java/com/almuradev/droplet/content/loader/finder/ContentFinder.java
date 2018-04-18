@@ -34,5 +34,5 @@ public interface ContentFinder {
   String INCLUDE_DIRECTORY_NAME = "include";
   PathMatcher XML_MATCHER = FileSystems.getDefault().getPathMatcher("glob:**.xml");
 
-  <C extends ContentType.Child, R extends ContentType.Root<C>> FoundContent<R, C> find(final R rootType, final Set<ChildContentLoader<C>> childrenTypes);
+  <C extends ContentType.Child, R extends ContentType.Root<C>> void find(final FoundContent<R, C> foundContent, final R rootType, final Set<ChildContentLoader<C>> childrenTypes);
 }

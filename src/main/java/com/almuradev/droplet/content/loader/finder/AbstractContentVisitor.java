@@ -29,8 +29,6 @@ import com.almuradev.droplet.content.type.ContentBuilder;
 import com.almuradev.droplet.content.type.ContentType;
 import com.almuradev.droplet.util.PathVisitor;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import net.kyori.lunar.exception.Exceptions;
 import org.jdom2.Element;
 
@@ -46,6 +44,7 @@ import java.util.function.Supplier;
 import javax.inject.Provider;
 
 public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C extends ContentType.Child> implements ContentVisitor<R, C> {
+  private final FoundContent<R, C> foundContent;
   protected String namespace;
   protected Path namespacePath;
   protected R type;
@@ -53,10 +52,11 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
   protected ChildContentLoader<C> childLoader;
   protected C child;
   protected Path childPath;
-  protected final ListMultimap<C, FoundContentEntry<R, C>> entries = ArrayListMultimap.create();
   private DocumentFactory documentFactory;
-  protected List<FoundEntry> typeIncludes;
-  private ListMultimap<C, FoundEntry> childIncludes;
+
+  protected AbstractContentVisitor(final FoundContent<R, C> foundContent) {
+    this.foundContent = foundContent;
+  }
 
   @Override
   public void visitRoot(final Path path) {
@@ -79,10 +79,7 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
 
     final Path include = path.resolve(ContentFinder.INCLUDE_DIRECTORY_NAME);
     if(Files.isDirectory(include)) {
-      if(this.typeIncludes == null) {
-        this.typeIncludes = new ArrayList<>();
-      }
-      this.typeIncludes.addAll(this.includes(include));
+      this.includes(include).forEach(this.foundContent::pushTypeInclude);
     }
   }
 
@@ -94,18 +91,15 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
 
     final Path include = path.resolve(ContentFinder.INCLUDE_DIRECTORY_NAME);
     if(Files.isDirectory(include)) {
-      if(this.childIncludes == null) {
-        this.childIncludes = ArrayListMultimap.create();
-      }
-      this.childIncludes.putAll(type, this.includes(include));
+      this.includes(include).forEach(entry -> this.foundContent.pushChildInclude(type, entry));
     }
   }
 
   @Override
   public void visitEntry(final Path path, final Provider<ContentBuilder> builder) {
     final FoundContentEntry<R, C> entry = this.createEntry(path, builder);
-    this.childLoader.foundContent().offer(entry);
-    this.entries.put(entry.childType(), entry);
+    this.childLoader.foundContent().pushEntry((FoundContentEntry) entry);
+    this.foundContent.pushEntry(entry);
   }
 
   protected DocumentFactory documentFactory() {
@@ -154,10 +148,5 @@ public abstract class AbstractContentVisitor<R extends ContentType.Root<C>, C ex
       public void invalidate() {
       }
     };
-  }
-
-  @Override
-  public FoundContent<R, C> foundContent() {
-    return new FoundContent<>(this.entries, this.typeIncludes, this.childIncludes);
   }
 }

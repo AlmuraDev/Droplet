@@ -43,6 +43,4 @@ public interface ContentVisitor<R extends ContentType.Root<C>, C extends Content
   void visitChild(final ChildContentLoader<C> loader, final C type, final Path path);
 
   void visitEntry(final Path path, final Provider<ContentBuilder> builder);
-
-  FoundContent<R, C> foundContent();
 }
