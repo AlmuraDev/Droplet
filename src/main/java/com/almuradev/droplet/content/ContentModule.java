@@ -38,7 +38,6 @@ public final class ContentModule extends AbstractModule implements DropletBinder
   protected void configure() {
     this.bind(ContentManager.class).to(ContentManagerImpl.class);
     this.bind(new TypeLiteral<DynamicProvider<FeatureContext>>() {}).toInstance(new DynamicProvider<>());
-    this.bindFacet().to(ContentManagerImpl.class);
     this.bindGlobalProcessor(RootFilterProcessor.class);
   }
 }

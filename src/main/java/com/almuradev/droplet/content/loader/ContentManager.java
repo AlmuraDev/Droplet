@@ -23,7 +23,8 @@
  */
 package com.almuradev.droplet.content.loader;
 
-import net.kyori.membrane.facet.Enableable;
+public interface ContentManager {
+  void discover();
 
-public interface ContentManager extends Enableable {
+  void parse();
 }

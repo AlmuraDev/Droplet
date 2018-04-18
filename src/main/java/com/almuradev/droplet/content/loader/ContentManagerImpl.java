@@ -23,7 +23,6 @@
  */
 package com.almuradev.droplet.content.loader;
 
-import net.kyori.membrane.facet.Enableable;
 import org.slf4j.Logger;
 
 import java.util.Set;
@@ -32,7 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public final class ContentManagerImpl implements ContentManager, Enableable {
+public final class ContentManagerImpl implements ContentManager {
   private final Logger logger;
   private final Set<RootContentLoader> rootLoaders;
 
@@ -43,19 +42,18 @@ public final class ContentManagerImpl implements ContentManager, Enableable {
   }
 
   @Override
-  public void enable() {
+  public void discover() {
     this.logger.debug("Discovering content...");
     this.rootLoaders.forEach(RootContentLoader::discover);
+  }
+
+  @Override
+  public void parse() {
     this.logger.debug("Parsing content...");
     this.rootLoaders.forEach(RootContentLoader::parse);
     this.logger.debug("Validating content...");
     this.rootLoaders.forEach(RootContentLoader::validate);
     this.logger.debug("Loading content...");
     this.rootLoaders.forEach(RootContentLoader::queue);
-  }
-
-  @Override
-  public void disable() {
-
   }
 }
