@@ -23,8 +23,8 @@
  */
 package com.almuradev.droplet.parser.primitive.number;
 
-import com.almuradev.droplet.parser.primitive.PrimitiveParser;
 import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.PrimitiveParser;
 
 /**
  * Parses a {@link Node} into a number of type {@code T}.

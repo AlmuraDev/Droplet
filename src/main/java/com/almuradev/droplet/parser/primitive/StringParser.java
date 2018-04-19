@@ -24,13 +24,14 @@
 package com.almuradev.droplet.parser.primitive;
 
 import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.PrimitiveParser;
 
 import javax.inject.Singleton;
 
 @Singleton
 public class StringParser implements PrimitiveParser<String> {
   @Override
-  public String parse(final Node node, final String string) {
+  public String throwingParse(final Node node, final String string) {
     return string;
   }
 }

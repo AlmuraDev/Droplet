@@ -23,7 +23,7 @@
  */
 package com.almuradev.droplet.component.filter;
 
-import com.almuradev.droplet.parser.Parser;
+import net.kyori.xml.parser.Parser;
 
 /**
  * Root filter parser.

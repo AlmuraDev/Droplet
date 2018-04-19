@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class DoubleParser implements NumberParser<Double> {
   @Override
-  public Double parse(final Node node, final String string) throws XMLException {
+  public Double throwingParse(final Node node, final String string) throws XMLException {
     try {
       return Double.parseDouble(string);
     } catch(final NumberFormatException e) {

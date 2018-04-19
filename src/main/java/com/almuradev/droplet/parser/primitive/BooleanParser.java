@@ -24,13 +24,14 @@
 package com.almuradev.droplet.parser.primitive;
 
 import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.PrimitiveParser;
 
 import javax.inject.Singleton;
 
 @Singleton
 public class BooleanParser implements PrimitiveParser<Boolean> {
   @Override
-  public Boolean parse(final Node node, final String string) {
+  public Boolean throwingParse(final Node node, final String string) {
     return Boolean.parseBoolean(string);
   }
 }

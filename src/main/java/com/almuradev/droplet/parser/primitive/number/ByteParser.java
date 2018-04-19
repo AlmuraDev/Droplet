@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class ByteParser implements NumberParser<Byte> {
   @Override
-  public Byte parse(final Node node, final String string) throws XMLException {
+  public Byte throwingParse(final Node node, final String string) throws XMLException {
     try {
       return Byte.parseByte(string);
     } catch(final NumberFormatException e) {

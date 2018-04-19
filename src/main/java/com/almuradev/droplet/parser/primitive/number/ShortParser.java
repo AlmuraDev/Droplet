@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class ShortParser implements NumberParser<Short> {
   @Override
-  public Short parse(final Node node, final String string) throws XMLException {
+  public Short throwingParse(final Node node, final String string) throws XMLException {
     try {
       return Short.parseShort(string);
     } catch(final NumberFormatException e) {

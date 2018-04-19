@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class FloatParser implements NumberParser<Float> {
   @Override
-  public Float parse(final Node node, final String string) throws XMLException {
+  public Float throwingParse(final Node node, final String string) throws XMLException {
     try {
       return Float.parseFloat(string);
     } catch(final NumberFormatException e) {

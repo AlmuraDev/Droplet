@@ -23,10 +23,10 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.parser.Parser;
 import com.almuradev.droplet.parser.ParserException;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.Parser;
 
 import java.util.Optional;
 

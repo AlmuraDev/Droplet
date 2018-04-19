@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Singleton
 public class LongParser implements NumberParser<Long> {
   @Override
-  public Long parse(final Node node, final String string) throws XMLException {
+  public Long throwingParse(final Node node, final String string) throws XMLException {
     try {
       return Long.parseLong(string);
     } catch(final NumberFormatException e) {

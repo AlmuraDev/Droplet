@@ -28,6 +28,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import net.kyori.violet.ForwardingBinder;
 import net.kyori.violet.FriendlyTypeLiteral;
 import net.kyori.violet.TypeArgument;
+import net.kyori.xml.parser.Parser;
 
 public interface ParserBinder extends ForwardingBinder {
   default <T> AnnotatedBindingBuilder<Parser<T>> bindParser(final Class<T> type) {
