@@ -23,6 +23,10 @@
  */
 package com.almuradev.droplet.component.filter;
 
+import net.kyori.fragment.filter.Filter;
+import net.kyori.fragment.filter.FilterQuery;
+import net.kyori.fragment.filter.FilterResponse;
+
 import java.util.function.Consumer;
 
 public final class FilterLinked<V> {
@@ -43,7 +47,7 @@ public final class FilterLinked<V> {
   }
 
   public void when(final FilterQuery query, final Consumer<V> consumer) {
-    if(this.query(query).allowed()) {
+    if(this.query(query) ==  FilterResponse.ALLOW) {
       consumer.accept(this.value());
     }
   }

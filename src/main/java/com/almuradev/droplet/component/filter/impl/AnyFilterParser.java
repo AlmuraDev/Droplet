@@ -21,24 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component.filter;
+package com.almuradev.droplet.component.filter.impl;
 
-/**
- * An extension of {@link Filter} that accepts a generic ({@code Q}) query type.
- *
- * @param <Q> the query type
- */
-public interface AbstractFilter<Q extends FilterQuery> extends Filter {
-  boolean canQuery(final FilterQuery query);
+import com.almuradev.droplet.component.filter.FilterParser;
+import com.almuradev.droplet.component.filter.FilterTypeParser;
+import net.kyori.fragment.filter.impl.AnyFilter;
+import net.kyori.xml.node.Node;
+
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+public final class AnyFilterParser implements FilterTypeParser<AnyFilter> {
+  @Inject private FilterParser parser;
 
   @Override
-  default FilterResponse query(final FilterQuery query) {
-    // Prevent cast exceptions if the query type is not accepted
-    if(!this.canQuery(query)) {
-      return FilterResponse.ABSTAIN;
-    }
-    return this.queryInternal((Q) query);
+  public AnyFilter throwingParse(final Node node) {
+    return new AnyFilter(this.parser.parse(node.elements()).collect(Collectors.toList()));
   }
-
-  FilterResponse queryInternal(final Q query);
 }

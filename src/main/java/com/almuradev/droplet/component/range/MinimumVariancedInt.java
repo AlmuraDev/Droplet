@@ -23,8 +23,8 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.component.filter.Filter;
-import com.almuradev.droplet.component.filter.FilterQuery;
+import net.kyori.fragment.filter.Filter;
+import net.kyori.fragment.filter.FilterQuery;
 import net.kyori.lunar.collection.MoreIterables;
 
 import java.util.List;

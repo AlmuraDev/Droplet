@@ -23,10 +23,10 @@
  */
 package com.almuradev.droplet.component.filter.impl;
 
-import com.almuradev.droplet.component.filter.Filter;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
+import net.kyori.fragment.filter.Filter;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 

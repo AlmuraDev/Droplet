@@ -23,44 +23,26 @@
  */
 package com.almuradev.droplet.component.filter.impl;
 
-import com.almuradev.droplet.component.filter.Filter;
 import com.almuradev.droplet.component.filter.FilterParser;
-import com.almuradev.droplet.component.filter.FilterQuery;
-import com.almuradev.droplet.component.filter.FilterResponse;
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.google.common.collect.MoreCollectors;
+import net.kyori.fragment.filter.impl.NotFilter;
 import net.kyori.xml.node.Node;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-public final class NotFilter extends AbstractSingleFilter {
-  public NotFilter(final Filter filter) {
-    super(filter);
+@Singleton
+public final class NotFilterParser implements FilterTypeParser<NotFilter> {
+  private final FilterParser parser;
+
+  @Inject
+  private NotFilterParser(final FilterParser parser) {
+    this.parser = parser;
   }
 
   @Override
-  public FilterResponse query(final FilterQuery query) {
-    return this.filter.query(query).inverse();
-  }
-
-  @Override
-  public String toString() {
-    return "NotFilter{" + this.filter + '}';
-  }
-
-  @Singleton
-  public static final class Parser implements FilterTypeParser<NotFilter> {
-    private final FilterParser parser;
-
-    @Inject
-    private Parser(final FilterParser parser) {
-      this.parser = parser;
-    }
-
-    @Override
-    public NotFilter throwingParse(final Node node) {
-      return new NotFilter(this.parser.parse(node.elements().collect(MoreCollectors.onlyElement())));
-    }
+  public NotFilter throwingParse(final Node node) {
+    return new NotFilter(this.parser.parse(node.elements().collect(MoreCollectors.onlyElement())));
   }
 }

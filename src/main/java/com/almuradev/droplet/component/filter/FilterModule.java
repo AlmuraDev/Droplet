@@ -23,11 +23,12 @@
  */
 package com.almuradev.droplet.component.filter;
 
-import com.almuradev.droplet.component.filter.impl.AllFilter;
-import com.almuradev.droplet.component.filter.impl.AnyFilter;
+import com.almuradev.droplet.component.filter.impl.AllFilterParser;
+import com.almuradev.droplet.component.filter.impl.AnyFilterParser;
 import com.almuradev.droplet.component.filter.impl.FilterReferenceParser;
-import com.almuradev.droplet.component.filter.impl.NotFilter;
+import com.almuradev.droplet.component.filter.impl.NotFilterParser;
 import com.almuradev.droplet.parser.ParserBinder;
+import net.kyori.fragment.filter.Filter;
 import net.kyori.violet.AbstractModule;
 
 public final class FilterModule extends AbstractModule implements FilterBinder, ParserBinder {
@@ -36,9 +37,9 @@ public final class FilterModule extends AbstractModule implements FilterBinder, 
     this.bindParser(Filter.class).to(RootFilterParserImpl.class);
     this.bind(FilterParser.class).to(RootFilterParserImpl.class);
 
-    this.bindFilter("all").to(AllFilter.Parser.class);
-    this.bindFilter("any").to(AnyFilter.Parser.class);
+    this.bindFilter("all").to(AllFilterParser.class);
+    this.bindFilter("any").to(AnyFilterParser.class);
     this.bindFilter(FilterReferenceParser.ID).to(FilterReferenceParser.class);
-    this.bindFilter("not").to(NotFilter.Parser.class);
+    this.bindFilter("not").to(NotFilterParser.class);
   }
 }

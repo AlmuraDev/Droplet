@@ -23,6 +23,7 @@
  */
 package com.almuradev.droplet.component.filter;
 
+import net.kyori.fragment.filter.Filter;
 import net.kyori.xml.parser.Parser;
 
 public interface FilterTypeParser<F extends Filter> extends Parser<F> {

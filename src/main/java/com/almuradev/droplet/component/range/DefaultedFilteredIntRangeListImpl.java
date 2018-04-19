@@ -24,7 +24,8 @@
 package com.almuradev.droplet.component.range;
 
 import com.almuradev.droplet.component.filter.FilterLinked;
-import com.almuradev.droplet.component.filter.FilterQuery;
+import net.kyori.fragment.filter.FilterQuery;
+import net.kyori.fragment.filter.FilterResponse;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public final class DefaultedFilteredIntRangeListImpl implements DefaultedFiltere
   @Override
   public IntRange oneOrDefault(final FilterQuery query) {
     for(final FilterLinked<IntRange> entry : this.list) {
-      if(entry.query(query).allowed()) {
+      if(entry.query(query) == FilterResponse.ALLOW) {
         return entry.value();
       }
     }

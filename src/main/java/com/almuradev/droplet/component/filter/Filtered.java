@@ -23,6 +23,8 @@
  */
 package com.almuradev.droplet.component.filter;
 
+import net.kyori.fragment.filter.Filter;
+
 public interface Filtered {
   Filter filter();
 }

@@ -23,7 +23,7 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.component.filter.Filter;
+import net.kyori.fragment.filter.Filter;
 
 import java.util.Objects;
 import java.util.Random;

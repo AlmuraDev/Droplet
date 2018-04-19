@@ -23,7 +23,7 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.component.filter.FilterQuery;
+import net.kyori.fragment.filter.FilterQuery;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;

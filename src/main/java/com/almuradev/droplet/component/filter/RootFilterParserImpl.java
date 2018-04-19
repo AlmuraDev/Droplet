@@ -28,6 +28,7 @@ import com.almuradev.droplet.content.feature.Feature;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
 import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.parser.ParserException;
+import net.kyori.fragment.filter.Filter;
 import net.kyori.lunar.EvenMoreObjects;
 import net.kyori.lunar.exception.Exceptions;
 import net.kyori.xml.XMLException;

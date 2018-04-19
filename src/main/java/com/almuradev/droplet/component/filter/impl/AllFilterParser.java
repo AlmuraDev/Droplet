@@ -21,7 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component.filter;
+package com.almuradev.droplet.component.filter.impl;
 
-public interface FilterQuery {
+import com.almuradev.droplet.component.filter.FilterParser;
+import com.almuradev.droplet.component.filter.FilterTypeParser;
+import net.kyori.fragment.filter.impl.AllFilter;
+import net.kyori.xml.node.Node;
+
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+public final class AllFilterParser implements FilterTypeParser<AllFilter> {
+  @Inject private FilterParser parser;
+
+  @Override
+  public AllFilter throwingParse(final Node node) {
+    return new AllFilter(this.parser.parse(node.elements()).collect(Collectors.toList()));
+  }
 }
