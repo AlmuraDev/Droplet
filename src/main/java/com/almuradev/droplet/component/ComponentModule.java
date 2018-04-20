@@ -23,8 +23,8 @@
  */
 package com.almuradev.droplet.component;
 
-import com.almuradev.droplet.component.filter.FilterModule;
 import com.almuradev.droplet.component.range.RangeModule;
+import net.kyori.fragment.filter.FilterModule;
 import net.kyori.violet.AbstractModule;
 
 public final class ComponentModule extends AbstractModule {

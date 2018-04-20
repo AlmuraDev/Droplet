@@ -42,6 +42,7 @@ public final class ContentModule extends AbstractModule implements DropletBinder
   }
 
   private void bindFeatureContextProvider() {
+    this.bind(net.kyori.fragment.feature.context.FeatureContext.class).toProvider(new TypeLiteral<DynamicProvider<FeatureContext>>() {});
     this.bind(FeatureContext.class).toProvider(new TypeLiteral<DynamicProvider<FeatureContext>>() {});
     this.bind(new TypeLiteral<DynamicProvider<FeatureContext>>() {}).toInstance(new DynamicProvider<>());
   }
