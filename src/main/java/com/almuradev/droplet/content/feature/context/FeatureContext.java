@@ -23,30 +23,6 @@
  */
 package com.almuradev.droplet.content.feature.context;
 
-import net.kyori.xml.XMLException;
-import net.kyori.xml.node.Node;
-
-import java.util.List;
-
-public interface FeatureContext {
-  <F> F get(final Class<F> type, final Node node) throws XMLException;
-
-  /**
-   * @deprecated use {@link #get(Class, Node)} when you have the node requesting the feature present - this allows
-   *   us to track where references are used when a feature has been requested before it has been defined
-   */
-  @Deprecated
-  <F> F get(final Class<F> type, final String id);
-
-  <F> F add(final Class<F> type, final Node node, final F feature);
-
-  /**
-   * @deprecated use {@link #add(Class, Node, Object)} when you have the node defining the feature present
-   */
-  @Deprecated
-  <F> F add(final Class<F> type, final String id, final F feature);
-
-  List<XMLException> validate();
-
+public interface FeatureContext extends net.kyori.fragment.feature.context.FeatureContext {
   void addParent(final FeatureContext that);
 }

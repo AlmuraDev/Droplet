@@ -24,10 +24,9 @@
 package com.almuradev.droplet.component.filter;
 
 import com.almuradev.droplet.component.filter.impl.FilterReferenceParser;
-import com.almuradev.droplet.content.feature.Feature;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
-import com.almuradev.droplet.content.inject.DynamicProvider;
 import com.almuradev.droplet.parser.ParserException;
+import net.kyori.fragment.feature.Feature;
 import net.kyori.fragment.filter.Filter;
 import net.kyori.lunar.EvenMoreObjects;
 import net.kyori.lunar.exception.Exceptions;
@@ -38,13 +37,14 @@ import org.jdom2.Element;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
 public final class RootFilterParserImpl implements FilterParser {
   private final Map<String, FilterTypeParser<?>> parsers;
   private final FilterReferenceParser refParser;
-  @Inject private DynamicProvider<FeatureContext> featureContext;
+  @Inject private Provider<FeatureContext> featureContext;
 
   @Inject
   private RootFilterParserImpl(final Map<String, FilterTypeParser<?>> parsers, final FilterReferenceParser refParser) {

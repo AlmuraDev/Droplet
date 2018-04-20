@@ -25,21 +25,21 @@ package com.almuradev.droplet.component.filter.impl;
 
 import com.almuradev.droplet.component.filter.FilterTypeParser;
 import com.almuradev.droplet.content.feature.context.FeatureContext;
-import com.almuradev.droplet.content.inject.DynamicProvider;
 import net.kyori.fragment.filter.Filter;
 import net.kyori.xml.XMLException;
 import net.kyori.xml.node.Node;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
 public final class FilterReferenceParser implements FilterTypeParser<Filter> {
   public static final String ID = "filter";
-  private final DynamicProvider<FeatureContext> featureContext;
+  private final Provider<FeatureContext> featureContext;
 
   @Inject
-  private FilterReferenceParser(final DynamicProvider<FeatureContext> featureContext) {
+  private FilterReferenceParser(final Provider<FeatureContext> featureContext) {
     this.featureContext = featureContext;
   }
 
