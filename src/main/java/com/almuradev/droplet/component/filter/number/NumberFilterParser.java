@@ -21,18 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component;
+package com.almuradev.droplet.component.filter.number;
 
-import com.almuradev.droplet.component.filter.DropletFilterModule;
-import com.almuradev.droplet.component.range.RangeModule;
-import net.kyori.fragment.filter.FilterModule;
-import net.kyori.violet.AbstractModule;
+import net.kyori.xml.XMLException;
+import net.kyori.xml.node.Node;
+import net.kyori.xml.parser.Parser;
 
-public final class ComponentModule extends AbstractModule {
+import java.util.function.Function;
+
+import javax.inject.Inject;
+
+public abstract class NumberFilterParser<F extends NumberFilter> implements Parser<F> {
+  private final Function<Number, F> function;
+  @Inject private NumberParser parser;
+
+  public NumberFilterParser(final Function<Number, F> function) {
+    this.function = function;
+  }
+
   @Override
-  protected void configure() {
-    this.install(new FilterModule());
-    this.install(new DropletFilterModule());
-    this.install(new RangeModule());
+  public F throwingParse(final Node node) throws XMLException {
+    return this.function.apply(this.parser.parse(node));
   }
 }

@@ -21,18 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component;
+package com.almuradev.droplet.component.filter;
 
-import com.almuradev.droplet.component.filter.DropletFilterModule;
-import com.almuradev.droplet.component.range.RangeModule;
-import net.kyori.fragment.filter.FilterModule;
+import com.almuradev.droplet.component.filter.number.impl.EqualToFilter;
+import com.almuradev.droplet.component.filter.number.impl.GreaterThanFilter;
+import com.almuradev.droplet.component.filter.number.impl.LessThanFilter;
+import net.kyori.fragment.filter.FilterBinder;
 import net.kyori.violet.AbstractModule;
 
-public final class ComponentModule extends AbstractModule {
+public final class DropletFilterModule extends AbstractModule {
   @Override
   protected void configure() {
-    this.install(new FilterModule());
-    this.install(new DropletFilterModule());
-    this.install(new RangeModule());
+    final FilterBinder filters = new FilterBinder(this.binder());
+    filters.bindFilter("equal-to").to(EqualToFilter.Parser.class);
+    filters.bindFilter("greater-than").to(GreaterThanFilter.Parser.class);
+    filters.bindFilter("less-than").to(LessThanFilter.Parser.class);
   }
 }

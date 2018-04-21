@@ -24,8 +24,6 @@
 package com.almuradev.droplet.content.feature.context;
 
 import com.google.common.collect.MoreCollectors;
-import net.kyori.fragment.feature.Feature;
-import net.kyori.fragment.feature.context.FeatureContextEntry;
 import net.kyori.lunar.Optionals;
 
 import java.util.ArrayList;
@@ -36,10 +34,10 @@ public class FeatureContextImpl extends net.kyori.fragment.feature.context.Featu
   private final List<FeatureContextImpl> parents = new ArrayList<>();
 
   @Override
-  protected <F extends Feature> FeatureContextEntry<F> feature(Class<F> type, String id) {
+  protected <F> FeatureContextEntry<F> feature(Class<F> type, String id) {
     return (FeatureContextEntry<F>) Optionals.first(
-      Optional.ofNullable(this.features.get(id)),
-      this.parents.stream().map(parent -> parent.features.get(id)).collect(MoreCollectors.toOptional())
+      Optional.ofNullable(this.featuresById.get(type, id)),
+      this.parents.stream().map(parent -> parent.featuresById.get(type, id)).collect(MoreCollectors.toOptional())
     ).orElseGet(() -> super.feature(type, id));
   }
 

@@ -21,18 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component;
+package com.almuradev.droplet.component.filter.number;
 
-import com.almuradev.droplet.component.filter.DropletFilterModule;
-import com.almuradev.droplet.component.range.RangeModule;
-import net.kyori.fragment.filter.FilterModule;
-import net.kyori.violet.AbstractModule;
+import net.kyori.fragment.filter.FilterQuery;
 
-public final class ComponentModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    this.install(new FilterModule());
-    this.install(new DropletFilterModule());
-    this.install(new RangeModule());
-  }
+public interface NumberQuery extends FilterQuery {
+  Number number();
 }

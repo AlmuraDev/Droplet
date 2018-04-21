@@ -21,18 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.almuradev.droplet.component;
+package com.almuradev.droplet.component.filter.number.impl;
 
-import com.almuradev.droplet.component.filter.DropletFilterModule;
-import com.almuradev.droplet.component.range.RangeModule;
-import net.kyori.fragment.filter.FilterModule;
-import net.kyori.violet.AbstractModule;
+import com.almuradev.droplet.component.filter.number.NumberFilter;
+import com.almuradev.droplet.component.filter.number.NumberFilterParser;
+import com.almuradev.droplet.component.filter.number.NumberQuery;
+import net.kyori.fragment.filter.FilterResponse;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public final class ComponentModule extends AbstractModule {
+public class GreaterThanFilter extends NumberFilter.Impl {
+  public GreaterThanFilter(final Number number) {
+    super(number);
+  }
+
   @Override
-  protected void configure() {
-    this.install(new FilterModule());
-    this.install(new DropletFilterModule());
-    this.install(new RangeModule());
+  public FilterResponse typedQuery(final @NonNull NumberQuery query) {
+    return FilterResponse.from(this.compare(query) == -1);
+  }
+
+  public static class Parser extends NumberFilterParser<GreaterThanFilter> {
+    public Parser() {
+      super(GreaterThanFilter::new);
+    }
   }
 }
