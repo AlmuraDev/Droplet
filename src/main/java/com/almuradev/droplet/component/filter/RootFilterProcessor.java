@@ -26,7 +26,7 @@ package com.almuradev.droplet.component.filter;
 import com.almuradev.droplet.content.processor.GlobalProcessor;
 import net.kyori.fragment.filter.Filter;
 import net.kyori.xml.node.Node;
-import net.kyori.xml.parser.Parser;
+import net.kyori.xml.node.parser.Parser;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

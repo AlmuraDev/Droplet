@@ -25,8 +25,8 @@ package com.almuradev.droplet;
 
 import com.almuradev.droplet.component.ComponentModule;
 import com.almuradev.droplet.content.ContentModule;
-import com.almuradev.droplet.parser.ParserModule;
 import net.kyori.violet.AbstractModule;
+import net.kyori.xml.node.parser.ParserModule;
 
 public final class DropletModule extends AbstractModule {
   @Override

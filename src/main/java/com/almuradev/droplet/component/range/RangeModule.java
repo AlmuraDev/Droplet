@@ -23,13 +23,14 @@
  */
 package com.almuradev.droplet.component.range;
 
-import com.almuradev.droplet.parser.ParserBinder;
 import net.kyori.violet.AbstractModule;
+import net.kyori.xml.node.parser.ParserBinder;
 
-public final class RangeModule extends AbstractModule implements ParserBinder {
+public final class RangeModule extends AbstractModule {
   @Override
   protected void configure() {
-    this.bindParser(DoubleRange.class).to(DoubleRangeParser.class);
-    this.bindParser(IntRange.class).to(IntRangeParser.class);
+    final ParserBinder parsers = new ParserBinder(this.binder());
+    parsers.bindParser(DoubleRange.class).to(DoubleRangeParser.class);
+    parsers.bindParser(IntRange.class).to(IntRangeParser.class);
   }
 }
