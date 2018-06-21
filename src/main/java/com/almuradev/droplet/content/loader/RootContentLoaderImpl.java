@@ -172,18 +172,18 @@ public class RootContentLoaderImpl<C extends ContentType.Child, B extends Conten
       .forEach(child -> {
         logger.debug("Validating {} content...", child.id());
         try(final IndentingLogger $ = logger.push()) {
-          this.foundContent.entries(child).forEach(entry -> {
-            entry.context().validate().forEach(exception -> {
-              final StringBuilder sb = new StringBuilder();
-              sb.append(entry.absolutePath().toString());
-              /* @Nullable */ final Node node = exception.node();
-              if(node != null) {
-                Nodes.appendLocation(node, sb);
-              }
-              sb.append(": ").append(exception.getMessage());
-              logger.error("{}", sb.toString());
-            });
-          });
+//          this.foundContent.entries(child).forEach(entry -> {
+//            entry.context().validate().forEach(exception -> {
+//              final StringBuilder sb = new StringBuilder();
+//              sb.append(entry.absolutePath().toString());
+//              /* @Nullable */ final Node node = exception.node();
+//              if(node != null) {
+//                Nodes.appendLocation(node, sb);
+//              }
+//              sb.append(": ").append(exception.getMessage());
+//              logger.error("{}", sb.toString());
+//            });
+//          });
         }
       });
   }

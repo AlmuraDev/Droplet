@@ -24,21 +24,26 @@
 package com.almuradev.droplet.content.feature.context;
 
 import com.google.common.collect.MoreCollectors;
+import net.kyori.feature.FeatureDefinition;
 import net.kyori.lunar.Optionals;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FeatureContextImpl extends net.kyori.fragment.feature.context.FeatureContextImpl implements FeatureContext {
+public class FeatureContextImpl extends net.kyori.feature.FeatureDefinitionContextImpl implements FeatureContext {
   private final List<FeatureContextImpl> parents = new ArrayList<>();
 
   @Override
-  protected <F> FeatureContextEntry<F> feature(Class<F> type, String id) {
-    return (FeatureContextEntry<F>) Optionals.first(
-      Optional.ofNullable(this.featuresById.get(type, id)),
-      this.parents.stream().map(parent -> parent.featuresById.get(type, id)).collect(MoreCollectors.toOptional())
-    ).orElseGet(() -> super.feature(type, id));
+  public <D extends FeatureDefinition> @NonNull D get(@NonNull Class<D> type, @NonNull String id) {
+    return (D) Optionals.first(
+      Optional.ofNullable(this.byId.get(type, id)),
+      this.parents.stream()
+        .map(parent -> parent.byId.get(type, id))
+        .map(Entry::get)
+        .collect(MoreCollectors.toOptional())
+    ).orElseGet(() -> super.get(type, id));
   }
 
   @Override

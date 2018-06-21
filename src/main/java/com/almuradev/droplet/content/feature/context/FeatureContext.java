@@ -23,6 +23,6 @@
  */
 package com.almuradev.droplet.content.feature.context;
 
-public interface FeatureContext extends net.kyori.fragment.feature.context.FeatureContext {
+public interface FeatureContext extends net.kyori.feature.FeatureDefinitionContext {
   void addParent(final FeatureContext that);
 }

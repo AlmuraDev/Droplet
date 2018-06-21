@@ -44,13 +44,13 @@ public final class DoubleRangeParser implements Parser<DoubleRange> {
 
   @Override
   public DoubleRange throwingParse(final Node node) throws XMLException {
-    final Optional<Node> value = node.attribute("value");
+    final Optional<Node> value = node.attribute("value").optional();
     if(value.isPresent()) {
       return new DoubleRangeImpl(this.doubleParser.parse(value.get()));
     }
 
-    final Optional<Node> min = node.attribute("min");
-    final Optional<Node> max = node.attribute("max");
+    final Optional<Node> min = node.attribute("min").optional();
+    final Optional<Node> max = node.attribute("max").optional();
     if(min.isPresent() && max.isPresent()) {
       return new DoubleRangeImpl(this.doubleParser.parse(min.get()), this.doubleParser.parse(max.get()));
     }

@@ -44,13 +44,13 @@ public final class IntRangeParser implements Parser<IntRange> {
 
   @Override
   public IntRange throwingParse(final Node node) throws XMLException {
-    final Optional<Node> value = node.attribute("value");
+    final Optional<Node> value = node.attribute("value").optional();
     if(value.isPresent()) {
       return new IntRangeImpl(this.intParser.parse(value.get()));
     }
 
-    final Optional<Node> min = node.attribute("min");
-    final Optional<Node> max = node.attribute("max");
+    final Optional<Node> min = node.attribute("min").optional();
+    final Optional<Node> max = node.attribute("max").optional();
     if(min.isPresent() && max.isPresent()) {
       return new IntRangeImpl(this.intParser.parse(min.get()), this.intParser.parse(max.get()));
     }
