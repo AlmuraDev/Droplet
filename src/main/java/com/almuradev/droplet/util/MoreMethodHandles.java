@@ -37,7 +37,7 @@ import java.lang.reflect.Method;
 
 // TODO(kashike): This can be removed when we're running on Java 9.
 public final class MoreMethodHandles {
-  private static final Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR = EvenMoreObjects.get(Exceptions.rethrowSupplier(() -> {
+  private static final Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR = EvenMoreObjects.make(Exceptions.rethrowSupplier(() -> {
     final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class);
     constructor.setAccessible(true);
     return constructor;
