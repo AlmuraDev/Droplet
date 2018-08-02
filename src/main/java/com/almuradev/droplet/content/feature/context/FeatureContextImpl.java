@@ -36,14 +36,16 @@ public class FeatureContextImpl extends net.kyori.feature.FeatureDefinitionConte
   private final List<FeatureContextImpl> parents = new ArrayList<>();
 
   @Override
-  public <D extends FeatureDefinition> @NonNull D get(@NonNull Class<D> type, @NonNull String id) {
-    return (D) Optionals.first(
-      Optional.ofNullable(this.byId.get(type, id)),
-      this.parents.stream()
-        .map(parent -> parent.byId.get(type, id))
-        .map(Entry::get)
-        .collect(MoreCollectors.toOptional())
-    ).orElseGet(() -> super.get(type, id));
+  public <D extends FeatureDefinition> @NonNull D get(final @NonNull Class<D> type, final @NonNull String id) {
+    return (D) Optionals
+      .first(
+        Optional.ofNullable(this.byId.get(type, id)),
+        this.parents.stream()
+          .map(parent -> parent.byId.get(type, id))
+          .collect(MoreCollectors.toOptional())
+      )
+      .<FeatureDefinition>map(Entry::get)
+      .orElseGet(() -> super.get(type, id));
   }
 
   @Override
